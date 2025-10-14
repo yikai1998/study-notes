@@ -197,7 +197,7 @@ CSS的简写属性来同时设置多个字体相关属性    font: bold italic 4
             <td style="color: green; letter-spacing: 15px; text-decoration: line-through">庐山升龙霸</td>
             <td style="color: red; text-indent: 20px; width: 150px; font-size: 40px; font-family: 'KaiTi'">庐山百龙霸</td>
             <td style="line-height: 55px; width: 30px; text-align: right;">庐山千龙霸</td>
-            <td style="text-transform: uppercase; white-space: nowrap; font-family: cursive;">Fuck Airwallex, Fuck Airboard, Fuck Air everything oh yeah!</td>
+            <td style="text-transform: uppercase; white-space: nowrap; font-family: cursive;">Fuck a, Fuck b, Fuck c</td>
         </tr>
     </table>
 ```
