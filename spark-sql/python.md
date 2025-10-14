@@ -4,8 +4,8 @@
 ```py
 %python
 raw = """
-kyrie.wang.ctr@airwallex.com
-xueqin.chin.ctr@airwallex.com
+xxx@xxx.com
+xxx@xxx.com
 ...
 """
 ids = [line.strip() for line in raw.strip().splitlines()]
