@@ -323,7 +323,7 @@ class TokenManager:
             'authorization': self.access_bearer_token,
             'x-data-center': 'HK',
         }
-        url = 'https://airboard-ng.airwallex.com/api/v1/security/refresh'
+        url = 'https://xxxx/refresh'
         try:
             r = requests.post(url=url, data=json.dumps(data), headers=headers).text
             r = r.replace('false', 'False').replace('null', 'None').replace('true', 'True')
