@@ -279,7 +279,7 @@ download docker https://rancherdesktop.io/
 open the docker in backend
 open terminal
     docker run -p 127.0.0.1:9000:8080 asia-docker.pkg.dev/colab-images/public/runtime
-    copy: http://127.0.0.1:9000/?token=e35da72d2944bbb745350bc40479454fbc998ab768434385
+    copy: http://127.0.0.1:9000/?token=xxx
 
 import socket; print(socket.gethostname())
 ```
