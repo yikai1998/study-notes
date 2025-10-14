@@ -77,7 +77,7 @@ Applying special behavior parameter to function div
 
 # 实操场景1
 def search_datacenter(accountid=None, legalentityid=None):
-    url = 'https://airboard-ng.airwallex.com/graphql/kyc'
+    url = 'https:xxxgraphql/kyc'
     config.awx_headers['x-data-center'] = 'HK'  # reset to be default
     if accountid is None:
         caseInfo = {
@@ -111,7 +111,7 @@ def search_datacenter(accountid=None, legalentityid=None):
 """
 def search_datacenter(accountid):
     awx_headers['x-data-center'] = 'HK'  # reset to be default
-    url = f'https://airboard-ng.airwallex.com/api/v1/clientList/clientList?businessName%3D{accountid}%26pageSize%3D50'
+    url = f'https:xxxx?businessName%3D{accountid}%26pageSize%3D50'
     r = requests.get(url=url, headers=awx_headers).text
     r = r.replace('false', 'False').replace('null', 'None').replace('true', 'True')
     r = ast.literal_eval(r)
@@ -130,7 +130,7 @@ def datacenter_decorator(func):
 
 @datacenter_decorator
 def get_LegalEntityId(datacenter, accountid):
-    url = 'https://airboard-ng.airwallex.com/graphql/kyc'
+    url = 'xxxx/kyc'
     info = {
         'operationName': 'getLegalEntityList',
         'query': 'query xxxx',
