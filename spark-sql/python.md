@@ -47,7 +47,7 @@ print(df)
 dbutils.library.restartPython()
 ```
 ```py
-# in cell-2
+# in cell-2 (refresh databricks table)
 %python
 import gspread
 import pandas as pd
@@ -62,17 +62,39 @@ scopes = [
 
 creds = Credentials.from_service_account_file(service_account_path, scopes=scopes)
 gc = gspread.authorize(creds)
-sh = gc.open_by_key('xxx').get_worksheet_by_id(xxx)
+sh = gc.open_by_key("xxx").get_worksheet_by_id(xxx)
 df = sh.get_all_records()
 df = pd.DataFrame(df)
-df.columns = [c.strip().replace(' ', '_').replace('.', '_').lower() for c in df.columns]
+df.columns = [c.strip().replace(" ", "_").replace(".", "_").lower() for c in df.columns]
 print(df)
 
 df_spark = spark.createDataFrame(df)
 df_spark.createOrReplaceTempView("xxx")
 ```
 ```py
-# in cell-3
+# in cell-3 (refresh databricks table)
 create or replace table xxx as 
 select distinct * from xxx
+```
+```py
+# in cell-2 (refresh gsheet table)
+%python
+import gspread
+import pandas as pd
+from google.oauth2.service_account import Credentials
+
+service_account_path = "xxx.json"
+
+scopes = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive"
+]
+
+creds = Credentials.from_service_account_file(service_account_path, scopes=scopes)
+gc = gspread.authorize(creds)
+sh = gc.open_by_key("xxx").get_worksheet_by_id(xxx)
+sh.clear()
+df = spark.table('xxx').toPandas()
+print(df)
+sh.update("A1", [list(df.columns)] + df.values.tolist())
 ```
