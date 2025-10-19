@@ -1,0 +1,55 @@
+1. https://git-scm.com 安装Git，无脑next，直到出现`Git Bash Here`
+2. 告诉Git你是谁，一次配置 终身有效 以后所有仓库都用这个名字
+git config --global user.name "diy名字"
+git config --global user.email "注册 GitHub 的邮箱"
+3. 让电脑免密码进门 只做一次
+ssh-keygen -t ed25519 -C "同上邮箱"   # 然后一路回车
+把 \.ssh\id_ed25519.pub 打开 → 全复制 → GitHub 头像 → Settings → SSH and GPG keys → New SSH key → 贴进去 → Add
+    你电脑里存着“私钥”（不能泄露），GitHub 存着“公钥”（可公开）
+    两边用“公钥加密、私钥解密”的数学算法对暗号——暗号对上了，GitHub 就知道“是本人”，于是放行读写，且全程数据被加密。
+    只负责“开门”和“加密隧道”，跟仓库内容无关。
+4. git clone git@github.com:用户名/仓库.git   # 远程→本地，自动生成文件夹
+git clone 会自动把远程仓库整个搬下来，并在你当前所在的目录里新建一个同名文件夹（名字就是仓库名），里面已经包含：所有文件 + 完整的 .git 历史目录
+5. cd 仓库文件夹                            # 进去再干活
+你换文件夹，Git 就换仓库；无需重启、无需配置，自动识别（从你现在所在的目录开始，一路往上层目录找，直到碰见 .git 这个文件夹）。
+6. 三部曲
+git add . 或 git add 具体文件               # 把改动放进“购物车”
+git commit -m "一句话说明" # 购物车结账，生成一条历史
+git push                 # 把历史推到 GitHub，网页实时刷新
+7. 其他改动
+注意：Git 不管空抽屉，放张纸再关抽屉（纸＝任意文件，如 ".gitkeep" 只是大家约定俗成的名字，本质是“一张废纸”）；注意：git add 空目录名 会报错，必须指定具体文件。
+新建文件（夹） → 先建文件 → git add . → commit & push
+改文件 → 直接保存 → git add . → commit & push
+删文件 → git rm 文件名 → commit & push
+改文件夹名 → git mv 旧名 新名 → commit & push
+把 A/a.py 挪到 C/a.py（C 原来没有也会自动出现） → git mv A/a.py C/a.py → commit & push
+8. 反悔
+还没 commit：`git restore .`  命令作用域 = 当前仓库的全部文件，如果你 cd 到某个子文件夹再执行，也仍然还原整个仓库的所有改动，而不仅仅是这一层文件夹
+已 commit 未 push：`git reset --hard HEAD~1  # 退到上条历史（代码也回退）想退 3 步就 HEAD~3`
+已经push：`git revert <某次提交哈希>` 不删历史，只追加“反操作”，会生成一个新 commit，只针对那一次提交的改动做“反操作”，后面别人再新的提交完全不受影响，历史保持完整，大家都能正常 pull
+9. 换项目
+一个文件夹就是一个独立仓库，想换项目就 cd 进出；本地没有才需要再 git clone
+只要 cd 进这个仓库的任意子目录（包括根目录），执行git pull，Git 都会从当前目录一直向上找到 .git 文件夹，然后去拉这个仓库的远程更新。
+git pull 会把整个仓库的最新状态（所有文件、所有文件夹）同步到你本地：
+线上新增的文件/文件夹 → 本地自动出现
+线上被删的文件/文件夹 → 本地自动删除
+线上修改的内容 → 本地对应文件自动更新
+完成后，本地根目录就和线上完全一致（除了你本地未提交的改动）。
+10. 常用
+git status               # 看现在啥情况
+git log --oneline        # 看历史快递单
+git diff                 # 查看差异
+git pull                 # 上班先拉同事最新代码，随时可按，只对当前目录所属的那个仓库生效，如果本地也改了同一行，Git 会提示冲突，解决后再 commit 即可。
+11. 大致流水账
+如果线上仓库已存在，你本地从零开始。需要克隆，仅此一次。
+cd C:\Users\yikai\PycharmProjects          # 放项目的父目录
+git clone git@github.com:yikai1998/online-notes.git
+cd online-notes                            # 自动生成的文件夹
+每天开工时都输入git pull， 为了先同步（防止冲突）
+以后每天只需要
+git pull                   # 拿最新
+改一行字 → 保存
+git add 文件               # 或 git add .
+git commit -m "简述"
+git push                   # 完事
+
