@@ -51,6 +51,8 @@ dbutils.library.restartPython()
 %python
 import gspread
 import pandas as pd
+import numpy as np
+from pyspark.sql.types import StringType, StructField, StructType
 from google.oauth2.service_account import Credentials
 
 service_account_path = "xxx.json"
@@ -65,10 +67,17 @@ gc = gspread.authorize(creds)
 sh = gc.open_by_key("xxx").get_worksheet_by_id(xxx)
 df = sh.get_all_records()
 df = pd.DataFrame(df)
+df = df.drop_duplicates()
 df.columns = [c.strip().replace(" ", "_").replace(".", "_").lower() for c in df.columns]
 print(df)
 
-df_spark = spark.createDataFrame(df)
+df = df.replace({'': None, np.nan: None})  # 先丢空
+df = df.astype(str).where(pd.notnull(df), None)  # 条件为假的地方统一填 None
+schema = StructType([
+    StructField(col, StringType(), True) for col in df.columns
+    # True 表示“这一列允许存空值”；写 False 就代表“不能有空”，后期如果还有 None 会直接炸。
+])
+df_spark = spark.createDataFrame(df, schema=schema)
 df_spark.createOrReplaceTempView("xxx")
 ```
 ```py
