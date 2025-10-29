@@ -21,7 +21,12 @@ head_table = pd.DataFrame(sh_ref.get('F2:G'), columns=['OrgL2', 'Head'])  # list
 # 加工处理原数据
 df_old = sh_workpaper.get_all_values()
 df_old = pd.DataFrame(data=df_old[1:], columns=df_old[0])
-df_old = df_old.fillna('Null').replace(to_replace='', value='Null').drop_duplicates()  # 建议别用NaN，容易被自动转换成nan，其本身还是float
+NULL_FLAG = '__NULL__'          # 1. 先定好“空值标记”
+df = (df
+      .drop_duplicates()
+      .replace({'': None, np.nan: None})   # 2. 先统一成 None
+      .astype(str)
+      .where(pd.notnull(df), NULL_FLAG))   # 3. None → 自定义标记
 
 # 更新数据至googlesheet
 sh_to.clear()
