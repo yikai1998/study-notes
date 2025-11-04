@@ -266,7 +266,7 @@ like '%#_%' escape '#'  -- "#_"会匹配真实的下划线
 - lag 前一行
 - dense_rank  -- 1,1,2,...
 - rank  -- 1,1,3,...
-- nth_value  `nth_value(wlb.list_element:createdBy::string, 1, true) over (partition by ... order by wlb.list_element:createTime::bigint desc) as creator`
+- nth_value  `nth_value(wlb.list_element:createdBy::string, 1, true) over (partition by ... order by wlb.list_element:createTime::bigint desc) as creator` `nth_value(case when startswith(op.operation_type, 'KYC_S_OPS') then op.operator_email end, 1, true) over (partition by ikl.kyc_case_id order by op.operation_time desc rows between unbounded preceding and unbounded following) as last_operator_level_two`
 - row_number
 
 ---
