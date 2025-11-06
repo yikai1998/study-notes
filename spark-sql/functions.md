@@ -30,7 +30,7 @@ group by all;
 - arrays_overlap  // Returns true if a1 contains at least a non-null element present also in a2. If the arrays have no common element and they are both non-empty and either of them contains a null element null is returned, false otherwise.
 - array_join(array, delimiter[, nullReplacement])	 // Concatenates the elements of the given array using the delimiter and an optional string to replace nulls. If no value is set for nullReplacement, any null value is filtered.
 ```sql
-SELECT array_join(array('hello', null ,'world'), ' ', ',');
+SELECT array_join(array('hello', null ,'world'), '!!', '[replace]');
 ```
 - array_min, array_max, array_postion (1-based, 0 if not found)
 - array_remove  // Remove all elements that equal to element from array.
