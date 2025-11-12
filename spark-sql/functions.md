@@ -112,6 +112,9 @@ select convert_timezone('UTC', 'Asia/Shanghai', now())  -- current local time as
 - current_date()
 - current_timestamp()
 - date_diff(end, start)
+```
+select from_utc_timestamp(from_unixtime(1738146297797/1000), 'UTC+8'), to_date(from_unixtime(1738146297797/1000)), current_timestamp(), date_diff(MONTH, timestamp(from_unixtime(1738146297797/1000)), current_timestamp())
+```
 - date_format  // 把timestamp转换成string
 ```sql
 SELECT date_format('2016-04-08', 'y');  -- 2016
