@@ -119,6 +119,14 @@ SELECT date_format(current_date(), 'yyyy-MM-dd');  -- 2025-05-20
 SELECT date_format(now(), 'yyyy-MM-dd HH:mm:ss');  -- 2025-05-20 02:58:14
 ```
 - date_from_unix_date  // Create date from the number of days since 1970-01-01.
+```
+date_from_unix_date(x) 里的参数 x 必须是从 1970-01-01 开始的“天数”（整数天），而不是你常见的秒或毫秒级Unix时间戳。
+1738146297797 是一个毫秒级时间戳（通常是13位数，远大于一天数int能存的范围），会溢出。
+如果是毫秒级时间戳，先除以1000得到秒
+如果是秒级时间戳 from_unixtime(CAST(kc.created_at AS BIGINT))
+date_from_unix_date 的参数范围超了int最大，强制类型转的时候报溢出错。
+select from_unixtime(1738146297797/1000)  -- 2025-01-29 10:24:57
+```
 - date_part(field, source)  // Extracts a part of the date/timestamp or interval source.
 ```sql
 select date_part('year', now());  -- 2025
