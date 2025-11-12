@@ -107,7 +107,7 @@ SELECT convert_timezone('UTC', 'Asia/Shanghai', timestamp_ntz'2021-12-06 00:00:0
 SELECT convert_timezone('UTC', 'UTC+8', timestamp_ntz'2021-12-06 00:00:00');  -- 2021-12-06T08:00:00.000
 SELECT convert_timezone('UTC+8', timestamp_ntz'2021-12-06 00:00:00'); -- 2021-12-06T08:00:00.000 默认第一个param是utc
 select convert_timezone('UTC', 'Asia/Shanghai', now())  -- current local time as now() would return current utc response
-类似 from_utc_timestamp(timestamp, timezone)
+类似 from_utc_timestamp(timestamp/string, timezone)
 ```
 - current_date()
 - current_timestamp()
