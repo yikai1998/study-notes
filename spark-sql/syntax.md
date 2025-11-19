@@ -66,3 +66,7 @@ df.write.mode("overwrite").option("mergeSchema", "true").saveAsTable("`data-prod
 # 想彻底重建表结构（字段完全保持与 DataFrame 一致）：先Drop，再SaveAsTable 【`spark.sql("DROP TABLE IF EXISTS `data-prod-sg`.yikai_test_dbt.tmp_ids")`】，或用overwriteSchema（若支持）
 # 或者：df.createOrReplaceGlobalTempView("tmp_ids") 也可以，但不如落到表简单[serverless 环境下不能用 createOrReplaceGlobalTempView，只能用本地 temp view 或持久表。]
 ```
+
+```
+DECLARE VARIABLE row_limit = 10;
+```
