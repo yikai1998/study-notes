@@ -319,6 +319,12 @@ LATERAL VIEW OUTER explode(reviews) AS r
 -- 用LATERAL VIEW OUTER 或 explode_outer()可以实现类似LEFT JOIN的效果，即保留主表原有行，即便数组为空。
 -- LATERAL VIEW explode（不带OUTER）行为类似inner join，有空数组就会把那行“炸没”。
 ```
+```
+...
+lateral view outer posexplode(cast (kc.data:decisions as array<struct<comment:string, final:boolean, maker:string, result:string, reasons:array<string>, time:timestamp, source:string, additionalInfo:struct<actions:array<string>, assignTo:string, assignToLevel:string, referForAction:string>>>)) as `index`, decision_log
+...
+qualify row_number() over (partition by kc.id order by `index` desc) = 1
+```
 ```sql
 -- variant 好比“超大百宝箱”，到底能不能explode要先搞清楚它是不是“装了数组”！能的话先转array，不能就不能直接爆
 -- 结构体数组要“点名道姓”写struct才能转
