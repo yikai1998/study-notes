@@ -383,3 +383,4 @@ WHERE id = 'PAYMENT_METHOD_FEE'
 ✅ 正确用法: 'STRUCT<reviewDate:STRING, reviewResult:STRING, reviewType:STRING>'
 ```
 
+-- 只是简单的获取object里面的array的某个值，直接 ```bp.data:businessDetails:businessNames[0]:name::string```
