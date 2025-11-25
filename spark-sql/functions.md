@@ -288,6 +288,7 @@ like '%#_%' escape '#'  -- "#_"会匹配真实的下划线
 - explode
 BigQuery/标准SQL: UNNEST 一般写在 FROM 或 JOIN 后面，相当于"炸"列变多行；  
 Spark SQL: 直接 explode 写 SELECT 里，或写成 LATERAL VIEW explode(arr) AS num。
+gsheet里的explode，尤其是param，```SELECT explode(split(@btwo, ',')) AS temp_field```
 ```sql
 SELECT e.col1, e.col2
 FROM (SELECT explode(array(struct(10, 20), struct(null, 55))) AS e)
