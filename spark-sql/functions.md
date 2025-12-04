@@ -318,6 +318,7 @@ FROM (
 ) t
 LATERAL VIEW OUTER explode(reviews) AS r
 -- 用LATERAL VIEW OUTER 或 explode_outer()可以实现类似LEFT JOIN的效果，即保留主表原有行，即便数组为空。
+-- 所有 JOIN 写在 FROM 后, 且在 所有 LATERAL VIEW 之前。
 -- LATERAL VIEW explode（不带OUTER）行为类似inner join，有空数组就会把那行“炸没”。
 ```
 ```
