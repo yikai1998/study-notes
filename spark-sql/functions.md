@@ -26,6 +26,7 @@ group by all;
 - array_distinct(array)  // Removes duplicate values from the array.
 - array_except(array1, array2)  // Returns an array of the elements in array1 but not in array2, without duplicates.
 - array_insert(x, pos, val)  // Places val into index pos of array x. Array indices start at 1. The maximum negative index is -1 for which the function inserts new element after the current last element.
+- array_size  // length of array.
 - array_intersect(array1, array2)  // Returns an array of the elements in the intersection of array1 and array2, without duplicates.
 - arrays_overlap  // Returns true if a1 contains at least a non-null element present also in a2. If the arrays have no common element and they are both non-empty and either of them contains a null element null is returned, false otherwise.
 - array_join(array, delimiter[, nullReplacement])	 // Concatenates the elements of the given array using the delimiter and an optional string to replace nulls. If no value is set for nullReplacement, any null value is filtered.
