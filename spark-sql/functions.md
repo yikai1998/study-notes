@@ -257,6 +257,7 @@ SELECT split_part('oneAtwoBthreeCfourDfive', 'o', 2); -- neAtw
 <img width="857" alt="image" src="https://github.com/user-attachments/assets/3a77fd3d-1f78-490d-898a-bcbc47b5e113" />
 - = ==
 - regexp regexp_like rlike  // Returns true if `str` matches `regexp`, or false otherwise.
+
 ```sql
 -- Python： r'abc\n' => "abc\n"（四个字符）
 -- Spark SQL (escapedStringLiterals=false)： 'abc\n' => "abc\n"（四个字符）
@@ -265,6 +266,7 @@ SELECT regexp('%SystemDrive%\\Users\\John', '%SystemDrive%\\\\Users.*');  -- tru
 SELECT regexp('%SystemDrive%\\Users\\John', r'%SystemDrive%\\\\Users.*');  -- false
 select 'hello\\n\nworld';  -- hello\n换行world
 ```
+
 - like
 ```sql
 like 'a%_b%'  -- a后跟着至少一任意字符，然后b及后续内容
