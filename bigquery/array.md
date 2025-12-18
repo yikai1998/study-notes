@@ -66,6 +66,11 @@ GROUP BY sale_date;
 ![image](https://github.com/user-attachments/assets/dde871f9-559c-4b72-950d-6ed08d19cc25)
 
 ARRAY_AGG is typically used with GROUP BY: Because it aggregates row data over groups, collecting all applicable entries into arrays.  
+ARRAY_AGG() 的参数可以是任何表达式，包括：  
+标量（STRING、INT64 等）  
+STRUCT(...) e.g. ```ARRAY_AGG(STRUCT(account_id, businessdetails_businessname_local)) AS accounts```  
+甚至是“整行记录”（也就是 table 的 row，本身就是一个隐式 struct）  
+这里参数是 STRUCT(...)，结果 accounts 是 ARRAY<STRUCT<account_id STRING, businessdetails_businessname_local STRING>>  
 
 ---
 
