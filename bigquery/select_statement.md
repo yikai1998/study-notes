@@ -51,3 +51,38 @@ FROM orders;
  | 5        | sprocket  | 100      |
  *----------+-----------+----------*/
 ```
+
+---
+
+SELECT AS VALUE 是 BigQuery 在处理“GROUP BY + ARRAY_AGG(... LIMIT 1)”时的一种简化形式，用来直接返回 struct 本身，而不是再包一层字段名。更完整的例子是：
+```
+CREATE TEMP TABLE basic_per_cle AS (
+  SELECT AS VALUE
+    ARRAY_AGG(basic ORDER BY basic.account_id LIMIT 1)[OFFSET(0)]
+  FROM `...account_basic_info` AS basic
+  WHERE basic.account_status = 'ACTIVE'
+    AND basic.type = 'BUSINESS'
+  GROUP BY basic.client_legal_entity_id
+);
+```
+等价于
+```
+CREATE TEMP TABLE basic_per_cle AS (
+  SELECT
+    ARRAY_AGG(basic ORDER BY basic.account_id LIMIT 1)[OFFSET(0)] AS basic_row
+  FROM `...account_basic_info` AS basic
+  WHERE basic.account_status = 'ACTIVE'
+    AND basic.type = 'BUSINESS'
+  GROUP BY basic.client_legal_entity_id
+);
+```
+区别是：  
+不用给这个 struct 起名 basic_row  
+后面直接当成一行来用（SELECT * FROM basic_per_cle 就是所有列）  
+所以它适合这种模式：  
+  
+有一个表 T，里面一堆列  
+你想按 key group，每组只保留一行（比如“第一个”或“最新的”）  
+保留那一行的所有列  
+而不想手动列出所有列名。  
+在你这份大 SQL 里，凡是“per CLE 压成一行”的场景，都可以考虑这种写法，它既省代码，又让最终结果天然是“一行一个 CLE”，避免最后不得不用 DISTINCT/STRING_AGG(DISTINCT ...) 去救场。  
