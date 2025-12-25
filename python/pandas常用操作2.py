@@ -288,7 +288,7 @@ df7 = pd.DataFrame({
     ]
 })
 print(df7.dtypes)
-df7['Dateofbirth'] = pd.to_datetime(df7['Dateofbirth'], unit='s')
+df7['Dateofbirth'] = pd.to_datetime(df7['Dateofbirth'], unit='s', errors='coerce')
 print(df7)
 print(df7.dtypes)
 
