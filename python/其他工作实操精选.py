@@ -397,3 +397,53 @@ load_dotenv()
 print(os.environ.get('KEY_TEMP'))```
 load_dotenv(dotenv_path='路径/到/你的.env')  # 如果你的.env不在同一目录下
 """
+
+---
+# 希望动态基于scenario执行一套函数时
+"""
+ab_func.xxx 只能访问到在 ab_func.py 里定义的变量/函数
+从字符串变成真正的函数，要么：
+用 getattr(ab_func, '函数名字符串')
+要么在字典里直接存函数对象，而不是名字字符串
+"""
+```py
+request_config = {
+    '001': {
+        'func': 'get_case_business_kyc',
+        'params': {
+            'biz_type': 'BUSINESS_ONBOARDING',
+            'case_status': ['IN_REVIEW'],
+            'level': ['L1', 'L2'],
+            'review_status': ['READY_FOR_REVIEW', 'ASSIGNED'],
+            'triggered_by': [],
+        },
+        'dc_pool': ['hk', 'sg'],
+        'sheet': {
+            'sh_k': 'xxx',  # [kyc-onboarding-queue-python] [Daily Pending 2.0 - Business KYC non CA]
+            'tab_k': xxx,
+        }
+    },
+    ...
+}
+token = input('>> input token (please include Bearer at start): ')
+request_id = input('>> input request id (001 / 002 / 003): ').strip()
+cfg = request_config.get(request_id)
+if not cfg:
+    raise ValueError('未知的 request_id: ' + request_id)
+
+func_name = cfg['func']
+func = getattr(ab_func, func_name)  # 「反射」工具 等价于 ab_func.get_case_business_kyc
+params = cfg['params']
+dc_pool = cfg['dc_pool']
+sheet_info = cfg['sheet']
+
+all_dfs = []
+for dc in dc_pool:
+    df = func(token=token, dc=dc, **params)
+    all_dfs.append(df)
+
+if len(all_dfs) == 0:
+    com_df = pd.DataFrame()
+else:
+    com_df = pd.concat(all_dfs, ignore_index=True)
+```
