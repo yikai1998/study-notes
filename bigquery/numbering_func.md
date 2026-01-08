@@ -132,19 +132,19 @@ WITH finishers AS
 SELECT name,
   finish_time,
   division,
-  RANK() OVER (PARTITION BY division ORDER BY finish_time ASC) AS finish_rank
+  ROW_NUMBER() OVER (PARTITION BY division ORDER BY finish_time ASC) AS finish_rank
 FROM finishers;
 
-/*-----------------+------------------------+----------+-------------*
+/*-----------------+------------------------+----------+-------------+
  | name            | finish_time            | division | finish_rank |
  +-----------------+------------------------+----------+-------------+
  | Sophia Liu      | 2016-10-18 09:51:45+00 | F30-34   | 1           |
  | Meghan Lederer  | 2016-10-18 09:59:01+00 | F30-34   | 2           |
- | Nikki Leith     | 2016-10-18 09:59:01+00 | F30-34   | 2           |
+ | Nikki Leith     | 2016-10-18 09:59:01+00 | F30-34   | 3           |
  | Jen Edwards     | 2016-10-18 10:06:36+00 | F30-34   | 4           |
  | Lisa Stelzner   | 2016-10-18 09:54:11+00 | F35-39   | 1           |
  | Lauren Matthews | 2016-10-18 10:01:17+00 | F35-39   | 2           |
  | Desiree Berry   | 2016-10-18 10:05:42+00 | F35-39   | 3           |
  | Suzy Slane      | 2016-10-18 10:06:24+00 | F35-39   | 4           |
- *-----------------+------------------------+----------+-------------*/
+ +-----------------+------------------------+----------+-------------*/
 ```
