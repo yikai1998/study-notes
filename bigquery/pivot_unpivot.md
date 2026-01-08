@@ -1,6 +1,6 @@
 add the ```pivot/unpivot``` after ```from``` <br>
 
-PIVOT operator - rotates rows into columns, using aggregation
+PIVOT operator - rotates rows into columns, using aggregation - 一行行行行数据转化成一列列列列数据
 ```
 -- 创建示例数据表
 WITH sales AS (
@@ -24,7 +24,7 @@ ORDER BY sale_date;
 ```
 ![image](https://github.com/user-attachments/assets/c88e7e8a-f6cd-4c2e-80ec-b5d2486e641f)
 
-<br>UNPIVOT operator - rotates columns into rows
+<br>UNPIVOT operator - rotates columns into rows - 一列列列列数据转化成一行行行行数据
 
 ```
 -- 创建示例数据表
