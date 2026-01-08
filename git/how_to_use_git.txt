@@ -51,11 +51,13 @@ git pull                 # 上班先拉同事最新代码，随时可按，只�
 如果线上仓库已存在，你本地从零开始。需要克隆，仅此一次。
 cd C:\Users\yikai\PycharmProjects          # 放项目的父目录
 git clone git@github.com:yikai1998/online-notes.git
-cd online-notes                            # 自动生成的文件夹
+如果线上仓库已存在，你本地也存在过。从这里开始。
+cd .. 之类，来到父目录
+cd online-notes                            # 自动生成（导航至）文件夹
 每天开工时都输入git pull， 为了先同步（防止冲突）
 以后每天只需要
 git pull                   # 拿最新
-改一行字 → 保存
+改一行字 → 保存 【各种操作，手动直接前端鼠标操作】
 git add 文件               # 或 git add .
 git commit -m "简述"
 git push                   # 完事
