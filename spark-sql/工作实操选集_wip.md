@@ -95,3 +95,11 @@ where
   and not frozen
 );
 ```
+
+```sql
+-- pivot for string
+select * from (
+select legal_entity_id, maker, level_new
+from tt)
+pivot(concat_ws(',', collect_list(maker)) for level_new in ('L1' as `maker`, 'L2' as checker, 'L3' as compliance))
+```
