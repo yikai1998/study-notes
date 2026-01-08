@@ -5,6 +5,8 @@
 ---
 ## aggregate related
 - array_agg  // Collects and returns a list of non-unique elements.
+- collect_list  // Collects and returns a list of non-unique elements.
+- collect_set  // Collects and returns a set of unique elements.
 - listagg
 - string_agg
 ```sql
