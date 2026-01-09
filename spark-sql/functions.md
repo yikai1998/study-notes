@@ -388,5 +388,6 @@ WHERE id = 'PAYMENT_METHOD_FEE'
 {"reviewDate": "2023-01-01", "reviewResult": "pass", "reviewType": "annual"}
 ✅ 正确用法: 'STRUCT<reviewDate:STRING, reviewResult:STRING, reviewType:STRING>'
 ```
+<img width="426" height="262" alt="image" src="https://github.com/user-attachments/assets/4ab66938-c4f1-425c-b7c8-81eeb52abe3c" />
 
 -- 只是简单的获取object里面的array的某个值，直接 ```bp.data:businessDetails:businessNames[0]:name::string```
