@@ -4,6 +4,9 @@
 : 用来“取json路径字段”，:: 是“强制转类型”，?:: 是“安全转类型”（失败就null）
 原生/support-variant/raw 字段访问用 冒号
 struct/schema/cast出来的 字段访问用 点
+
+结构化数据（struct/array/map）：用 .field 或 ['field']（对 struct 也常可用）
+JSON 字符串/variant：用 JSON 函数/JSON path（比如 get_json_object、: 等）
 ```
 ```
 get_json_object(to_json(sf.data), '$.accountManager')
