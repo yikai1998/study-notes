@@ -102,4 +102,9 @@ select * from (
 select legal_entity_id, maker, level_new
 from tt)
 pivot(concat_ws(',', collect_list(maker)) for level_new in ('L1' as `maker`, 'L2' as checker, 'L3' as compliance))
+/*
+collect_list(maker) 是 pivot 需要的聚合（把多行变成一个结果）
+concat_ws 是对聚合结果做“格式化”（数组→字符串），它本身不是聚合，但包在外面也没问题，因为整体表达式里包含聚合。
+array_agg 当然也可以
+*/
 ```
