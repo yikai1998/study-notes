@@ -447,3 +447,20 @@ if len(all_dfs) == 0:
 else:
     com_df = pd.concat(all_dfs, ignore_index=True)
 ```
+
+---
+# 接口并发+进度展示
+```py
+with concurrent.futures.ThreadPoolExecutor(max_workers=3) as ex:
+    futures = [
+        ex.submit(ab.get_cle_details, dc='', token=token, account_id=None, legal_entity_id=cid)
+        for cid in cle_ids
+    ]
+
+    results, errors = [], []
+    for fut in tqdm(concurrent.futures.as_completed(futures), total=len(futures), desc="Fetching CLE"):
+        try:
+            results.append(fut.result())
+        except Exception as e:
+            errors.append(str(e))
+```
