@@ -18,3 +18,21 @@
 平常只打包自己的主项目，不用加--paths pandas...，不用写pandas的任何路径。
 自己写的diy模块/包，只要和主py文件在一个文件夹里，直接pyinstaller就能成功。
 但如果你把自写的包（比如diy）单独放到其他路径，比如D:\my_libs\diy，而不是main.py所在的文件夹，这时PyInstaller就找不到了，需要用-p D:\my_libs\diy明确告诉PyInstaller加这个查找路径。
+
+
+```py
+# 程序所在目录：打包后是可执行文件所在目录；不打包时是 .py 文件所在目录
+if getattr(sys, 'frozen', False):
+    BASE_DIR = os.path.dirname(sys.executable)
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+input_csv = os.path.join(BASE_DIR, "input.csv")
+output_csv = os.path.join(BASE_DIR, "output.csv")
+
+# 因为你在 Terminal 里运行时，input() 的提示字符串不一定会立刻刷出来（尤其是被 PyInstaller 包起来后、或 stdout 缓冲/终端行为不同），看起来就像“没打印提示就卡住/直接报错”
+sys.stdout.write(">> input token (please include Bearer at start): ")
+sys.stdout.flush()
+token = input().strip()
+...
+```
