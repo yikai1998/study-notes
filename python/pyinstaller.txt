@@ -36,3 +36,8 @@ sys.stdout.flush()
 token = input().strip()
 ...
 ```
+
+
+
+xattr -dr com.apple.quarantine "/path/to/main_02"
+chmod +x "/path/to/main_02"
