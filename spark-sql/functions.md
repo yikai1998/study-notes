@@ -257,7 +257,8 @@ SELECT split_part('oneAtwoBthreeCfourDfive', 'o', 2); -- neAtw
 - !expression  // logical not
 - expr1 <=> expr2  // 就是想让“两个都是NULL”也算“相等”，规避掉NULL导致的“比对失效”
 <img width="857" alt="image" src="https://github.com/user-attachments/assets/3a77fd3d-1f78-490d-898a-bcbc47b5e113" />
-- = ==
+
+
 - regexp regexp_like rlike  // Returns true if `str` matches `regexp`, or false otherwise.
 
 ```sql
