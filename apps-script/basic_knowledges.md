@@ -121,3 +121,41 @@ new Set(member_list) 创建一个 Set 对象，Set 只存储唯一值
 后续字符可以是字母、数字、下划线或美元符号
 不是JavaScript保留字(如if, class, return等)
 ```
+
+---
+
+```txt
+在 Apps Script 里有两种函数
+1.普通函数
+  只能在 Apps Script 编辑器里运行
+  或者被触发器（onEdit/onOpen/定时器）调用
+  不会自动从表格里传参
+  如果你直接点击“运行”，Apps Script 会：
+    运行函数
+    但不会给 a1Notation 传任何值
+    所以 a1Notation 是 undefined
+    getRange(undefined) 会报错
+2.自定义函数（可以在表格里当公式用）
+  在表格里用 =函数名() 调用
+  只能在表格里调用
+  Google Sheets 会自动把参数传进去
+  不能修改表格（只读）
+  不能读取格式/颜色（安全沙盒限制）
+  不能访问 UI、触发器、外部 API
+  不能写入单元格
+  不能用 onEdit
+
+  适合：
+  做复杂计算（比普通公式更灵活）
+  处理数组、对象、JSON（公式做不到）
+  生成动态数组（比 ARRAYFORMULA 更自由）
+  做 Google Sheets 公式做不到的字符串处理
+  做跨表、跨文件的纯“读取”操作
+
+  不适合：
+  改颜色
+  改格式
+  改数据验证
+  批量处理
+  读取 RGB（因为自定义函数不能读颜色）
+```
