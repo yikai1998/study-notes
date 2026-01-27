@@ -17,7 +17,7 @@ get_json_object 实际要操作 string 类型。如果参数不是字符串（�
 ```
 : 链式适合“在 VARIANT/JSON 里走路径”，返回还是 VARIANT，所以能一直写下去
 当列已经是 Spark 的强类型（struct/array/map）时，用 .
-
+element_at(from_json(get_json_object(to_json(kc.data), '$.decisions'), 'array<boolean>'), -1).final
 ```
 
 
