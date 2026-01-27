@@ -14,6 +14,11 @@ get_json_object(to_json(sf.data), '$.accountManager')
 get_json_object 实际要操作 string 类型。如果参数不是字符串（而是struct），就会报错。
 第一个sf.data:accountManager是Spark为struct/map字段提供的语法糖，推荐优先用
 ```
+```
+: 链式适合“在 VARIANT/JSON 里走路径”，返回还是 VARIANT，所以能一直写下去
+当列已经是 Spark 的强类型（struct/array/map）时，用 .
+
+```
 
 
 - ARRAY
