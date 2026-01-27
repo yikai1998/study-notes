@@ -4,7 +4,7 @@
 
 ---
 ## aggregate related
-- array_agg  // Collects and returns a list of non-unique elements.
+- array_agg  // Collects and returns a list of non-unique elements. ignore nulls by default, can not be set.
 - collect_list  // Collects and returns a list of non-unique elements.
 - collect_set  // Collects and returns a set of unique elements.
 - listagg
