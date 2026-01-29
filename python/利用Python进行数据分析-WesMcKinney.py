@@ -771,7 +771,7 @@ print(businessdashboard[(businessdashboard['CN_Entity'] == True)&(businessdashbo
 # 4     Alibaba                90           92          96       True
 
 # 使用loc和iloc选择数据
-# 轴标签loc，整数标签iloc
+# 轴标签loc，整数标签iloc. loc 和 iloc 都是 Pandas 里用来选取数据的索引器，核心区别是：按“标签(label)”还是按“位置(position)”取。
 print(businessdashboard.loc[[1,2,4],['CompanyName','FamousIndex']])
 #   CompanyName  FamousIndex
 # 1      Google           99
