@@ -108,3 +108,45 @@ concat_ws 是对聚合结果做“格式化”（数组→字符串），它本�
 array_agg 当然也可以
 */
 ```
+
+```sql
+create or replace temp view kc_log as 
+select * from (
+  select legal_entity_id, maker, level_new
+  from (
+    select 
+    * except (level_do_assign, level_after_assign, level_after_return),
+    ifnull(nth_value(coalesce(level_do_assign, level_after_assign, level_after_return), 1, true) over (partition by case_id order by `time` desc rows between current row and unbounded following), 'L1') as level_new
+    from (
+      select 
+      *,
+      case 
+        when assignToLevel = 'L2' then 'L1'
+        when assignToLevel = 'L3' then 'L2'
+        when assignToLevel = 'L4' then 'L3'
+        when assignToLevel = 'L5' then 'L4'
+      end as level_do_assign,
+      -- nth_value(assignToLevel, 1, true) over (partition by case_id order by `time` desc rows between current row and unbounded following) as `level`
+      lag(assignToLevel, 1) over (partition by case_id order by `time` asc) as level_after_assign,
+      case 
+        when lag(result, 1) over (partition by case_id order by `time` asc) = 'RETURN_TO_PREVIOUS_LEVEL' and lag(assignToLevel, 2) over (partition by case_id order by `time` asc) = 'L2' then 'L1'
+        when lag(result, 1) over (partition by case_id order by `time` asc) = 'RETURN_TO_PREVIOUS_LEVEL' and lag(assignToLevel, 2) over (partition by case_id order by `time` asc) = 'L3' then 'L2'
+        when lag(result, 1) over (partition by case_id order by `time` asc) = 'RETURN_TO_PREVIOUS_LEVEL' and lag(assignToLevel, 2) over (partition by case_id order by `time` asc) = 'L4' then 'L3'
+      end as level_after_return
+      from (
+        select
+        kc.id as case_id,
+        kc.data:kycRecordId::string as legal_entity_id,
+        kc.data:businessType::string as kyc_type,
+        decision_log.* except (additionalInfo),
+        decision_log.additionalInfo.*
+        from `risk-prod-sg`.silver.individualkyc__kyc_case as kc
+        lateral view outer posexplode(cast(kc.data:decisions as array<struct<comment:string, final:boolean, maker:string, result:string, reasons:array<string>, time:timestamp, source:string, additionalInfo:struct<actions:array<string>, assignTo:string, assignToLevel:string, referForAction:string>>>)) as `index`, decision_log
+        where kc.data:businessType::string in ('BUSINESS_ONBOARDING')
+      ) as t
+    )
+    qualify row_number() over (partition by legal_entity_id, level_new order by `time` desc) = 1
+  )
+)
+pivot(concat_ws(',', collect_list(maker)) for level_new in ('L1' as `maker`, 'L2' as checker, 'L3' as compliance));
+```
