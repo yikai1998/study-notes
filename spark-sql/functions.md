@@ -285,7 +285,8 @@ like '%#_%' escape '#'  -- "#_"会匹配真实的下划线
 - rank  -- 1,1,3,...
 - nth_value  `nth_value(wlb.list_element:createdBy::string, 1, true) over (partition by ... order by wlb.list_element:createTime::bigint desc) as creator` `nth_value(case when startswith(op.operation_type, 'KYC_S_OPS') then op.operator_email end, 1, true) over (partition by ikl.kyc_case_id order by op.operation_time desc rows between unbounded preceding and unbounded following) as last_operator_level_two`
 - row_number
-
+- last_value  `last_value(data:assignTo, true) over(partition by reference_id order by created_at rows between unbounded preceding and current row) assign_ff,`
+- last_value `ast_value(oplog.data.assignTo) ignore nulls over ...`
 ---
 
 ## others
