@@ -16,6 +16,8 @@ listagg(distinct grade, '*'),
 string_agg(distinct grade, '*')
 from values ('a', 'happy'), ('b', 'sad'), ('c', 'happy') as tab(grade, emo) 
 group by all;
+
+SELECT string_agg(col) WITHIN GROUP (ORDER BY col DESC) FROM VALUES ('a'), ('b'), ('c') AS tab(col);
 ```
 
 --- 
