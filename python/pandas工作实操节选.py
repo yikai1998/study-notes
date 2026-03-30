@@ -26,7 +26,7 @@ df = (df
       .drop_duplicates()
       .replace({'': None, np.nan: None})   # 2. 先统一成 None
       .astype(str)
-      .where(pd.notnull(df), NULL_FLAG))   # 3. None → 自定义标记 [满足条件就保留原值，不满足就用另一个值替换]
+      .where(pd.notnull(df), NULL_FLAG))   # 3. None → 自定义标记 [满足条件就保留原值，不满足就用另一个值替换] This method allows conditional replacement of values. Where the condition evaluates to True, the original values are retained; where it evaluates to False, values are replaced with corresponding entries from other
 
 # 更新数据至googlesheet
 sh_to.clear()
