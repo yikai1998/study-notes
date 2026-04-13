@@ -7,7 +7,7 @@ Python处理文本的25个经典操作
 
 import os
 
-# mac: "/";  window: "\\"
+# mac: "/";  window: "\\"; ~ 是“家目录”的简写，expanduser() 是把这个简写展开成真实路径。
 desktop = os.path.join(os.path.expanduser("~"), 'Desktop') + '/'
 print(desktop)
 
