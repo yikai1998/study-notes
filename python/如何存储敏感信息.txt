@@ -1,7 +1,8 @@
 写入 .env 文件
-  把敏感内容写到.env文本中，不让它进到版本控制（加进.gitignore）。
+  把敏感内容写到.env文本中，不让它进到版本控制（加进.gitignore。在项目根目录创建一个文件，名字叫“.gitignore”，里面写你不想上传的内容，比如“.env 换行 *.log 换行 *.pyc”，push的时候git 会自动忽略）。
   利用 python-dotenv 读取，高效又安全。
   环境切换时只改.env内容，无需动代码。
+  
 
 .env 并不是操作系统意义上的“文件类型”。
 它只是一个普通的纯文本文件，名字叫“.env”，约定俗成地被配置管理或库文件（如 python-dotenv）识别和加载。
@@ -17,7 +18,7 @@ import os
 from dotenv import load_dotenv
 
 basedir = os.path.dirname(os.path.abspath(__file__))  # 当前.py所在路径
-env_path = os.path.join(basedir, '..', '..', 'workspace/.env')  # 上上级目录下的.env
+env_path = os.path.join(basedir, '..', '..', 'workspace/.env')  # 从当前 .py 所在目录出发，往上两层，再进入 workspace 文件夹，再找 .env 文件
 load_dotenv(env_path)
 jira_username = os.getenv('JIRA-USER')
 jira_token = os.getenv('JIRA-TOKEN')
