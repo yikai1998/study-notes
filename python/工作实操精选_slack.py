@@ -2,12 +2,8 @@
 from slack_sdk import WebClient
 import os
 import certifi
-import gspread
 import pandas as pd
 os.environ['SSL_CERT_FILE'] = certifi.where()
-sa = gspread.service_account('gspread.json')
-sh1 = sa.open('yikai workpaper')
-sh_result = sh1.worksheet('Sheet74')
 SLACK_USER_TOKEN = 'token'
 client = WebClient(token=SLACK_USER_TOKEN)
 def get_all_users():
@@ -36,9 +32,9 @@ for emp in employees[:10]:
             'emp_name':  emp.get('name'),
             'emp_real_name': emp.get('real_name'),
         }
+        # 少量数据可以，大量用户时效率不高。更推荐先收集到 list，再一次性建 DataFrame：
+        # rows = []; rows.append({...}); df_result = pd.DataFrame(rows);
 # 输出
-sh_result.clear()
-sh_result.update([df_result.columns.values.tolist()] + df_result.values.tolist())
 print(df_result)
 
 
@@ -58,6 +54,6 @@ def invite_users(channel_id, user_ids):
         print('Successfully invited users:', response)
     except SlackApiError as e:
         print(e)
-        print(f'Error inviting users: {e.response['error']}')
+        print(f"Error inviting users: {e.response['error']}")
 # Invite Users to the Channel
 invite_users(CHANNEL_ID, USER_IDS)
