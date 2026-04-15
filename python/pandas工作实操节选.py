@@ -95,7 +95,7 @@ def flatten_cells(cell):
     return cell
 final_df = final_df.map(flatten_cells)
 ```
-list 没有 .map() 方法，用列表推导式 / map()
+list 没有 .map() 方法，用列表推导式 / map(func, base)
 Series 用 .map()
 DataFrame 按行/列处理，用：df.apply(func)
 DataFrame 整个表每个单元格处理，用：df.applymap(func)
