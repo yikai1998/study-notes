@@ -94,6 +94,12 @@ def flatten_cells(cell):
         return ', '.join(map(str, cell))  # Convert the list to a comma-separated string
     return cell
 final_df = final_df.map(flatten_cells)
+```
+list 没有 .map() 方法，用列表推导式 / map()
+Series 用 .map()
+DataFrame 按行/列处理，用：df.apply(func)
+DataFrame 整个表每个单元格处理，用：df.applymap(func)
+```
 
 # 希望Account Id等动态内容直接显示在validation check进度条（tqdm）的一行描述里，不要每条都print成新行，就像desc='validation check [Account Id xxx]'这种“随进度条实时刷新”
 with tqdm(df_work.values.tolist()) as bar:
