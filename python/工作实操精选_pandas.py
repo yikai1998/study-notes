@@ -16,7 +16,7 @@ df_old['LegalEntityId'] = df_old['AccountId'].progress_apply(lambda x: get_Legal
 
 # 从googlesheet上获取信息
 sa = gspread.service_account('./xxx.json')
-sh1 = sa.open('name of your googlesheet')
+sh1 = sa.open_by_key('xxx')
 sh_workpaper = sh1.worksheet('Workpaper-A')
 head_table = pd.DataFrame(sh_ref.get('F2:G'), columns=['OrgL2', 'Head'])  # list of bd head mapping
 
