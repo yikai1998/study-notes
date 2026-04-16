@@ -1,0 +1,61 @@
+# 常用参数
+-D, --onedir	默认模式，打包成一个文件夹（文件较多，有个exe及依赖目录）
+-F, --onefile	打包成一个独立exe文件（常用）
+-n NAME, --name NAME	指定生成的exe文件名（默认用你的py文件名）
+-c, --console, --nowindowed	生成命令行窗口程序，适用于需要显示cmd窗口和输出的程序
+-w, --windowed, --noconsole	不显示控制台窗口，适用于GUI应用（PyQt、Tkinter等）
+-i ICON.ico, --icon ICON.ico	指定生成的exe使用的图标文件
+--add-data SRC;DEST	手动将资源文件（如图片、数据）打包进exe
+--hidden-import MODULENAME	指定PyInstaller自动没找到但实际用到的模块（比如某些动态导入情况）
+--clean	打包前清理之前生成的缓存文件。养成这个习惯能解决 80% 的“上次打包明明好使，这次怎么玄学报错”的问题。
+--specpath PATH	指定.spec配置文件存放路径
+-p PATH, --paths PATH	添加额外的Python包import查找路径（一般是你的自定义库/依赖地址）
+--version-file FILE	指定一个文本，存放版本信息，打包时加入exe
+
+# 示例
+`pyinstaller -F -w -i myicon.ico --add-data "datafile.csv;." myscript.py`
+分隔符: Windows 用 ;，Mac/Linux 用 :。
+含义：打一个独立exe，有GUI不弹命令行，指定图标，打包资源文件datafile.csv到当前目录。如果你写 "photo.jpg;img"，那打包后它就会被放在 exe 内部的一个叫 img 的文件夹里。
+
+# 常见问题1
+平常只打包自己的主项目，不用加--paths pandas...，不用写pandas的任何路径。
+自己写的diy模块/包，只要和主py文件在一个文件夹里，直接pyinstaller就能成功。
+但如果你把自写的包（比如diy）单独放到其他路径，比如D:\my_libs\diy，而不是main.py所在的文件夹，这时PyInstaller就找不到了，需要用-p D:\my_libs\diy明确告诉PyInstaller加这个查找路径。
+
+# 常见问题2
+```py
+# 程序所在目录：打包后是可执行文件所在目录；不打包时是 .py 文件所在目录
+
+if getattr(sys, 'frozen', False):
+# “去 sys 模块里找找有没有叫 frozen 的属性，如果没有，就默认它是 False”。找到了 frozen，说明这是个【打包后的 exe】。在普通的 Python 环境里，sys 模块根本没有 frozen 这个属性。
+    """
+    你打包成了 main.exe，发给了朋友。
+    朋友把它放在了 C:\Users\Desktop\工具\ 文件夹里。
+    这时候，main.py 已经不存在了，它变成了一个 exe。
+    如果你还在代码里写死去找 D:\MyProject\，朋友的电脑上根本没这个目录，程序就崩溃了。
+    sys.frozen 会变成 True（表示被冻结打包了），此时 sys.executable 就会指代那个 main.exe 所在的真实位置（即朋友的桌面工具文件夹）
+    """
+    BASE_DIR = os.path.dirname(sys.executable)
+else:
+    """
+    你的脚本在 D:\MyProject\main.py。
+    这时候，你要找 config.csv，路径应该是 D:\MyProject\config.csv。    
+    """
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+input_csv = os.path.join(BASE_DIR, "input.csv")
+output_csv = os.path.join(BASE_DIR, "output.csv")
+
+# 因为你在 Terminal 里运行时，input() 的提示字符串不一定会立刻刷出来（尤其是被 PyInstaller 包起来后、或 stdout 缓冲/终端行为不同），看起来就像“没打印提示就卡住/直接报错”
+sys.stdout.write(">> input token (please include Bearer at start): ")
+sys.stdout.flush()  # 不管缓冲区满没满，立刻把里面的文字强行刷到屏幕上。这样能保证用户百分之百能看到提示。
+token = input().strip()
+...
+```
+
+# 常见问题3
+# macOS 命令（如果你在 Windows 上打包，生成的 .exe 直接发给别人，对方通常双击就能跑（最多被杀毒软件拦一下）。macOS 因为极其注重安全隐私，所以才需要你用那两行命令手动给程序“松绑”。）
+# 如果你在 Mac 上打包了一个程序，发给朋友，他打开时提示“文件损坏”或者“无法验证开发者”
+xattr -dr com.apple.quarantine "/path/to/main_02"  # 给你的程序发一张“通行证”，告诉系统：“这个程序是我自己写的，不是病毒，别拦着。”
+# 如果你发现你的程序双击没反应，或者提示“Permission Denied（拒绝访问）”
+chmod +x "/path/to/main_02"  # 给这个文件贴上“可执行”的标签。在 Mac/Linux 里，文件默认不能直接跑，必须手动赋予它“跑”的权力
