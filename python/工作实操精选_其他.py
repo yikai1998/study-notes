@@ -34,6 +34,13 @@ def search_datacenter(legal_entity_id=None, account_id=None, token=None):
     r = requests.post(url=url, headers=headers, json=data)  # requests帮你做了 dumps (dict -> JSON字符串)
     r.raise_for_status()  # 如果 HTTP 状态码是 4xx/5xx，直接报错；否则继续。用于尽早发现请求失败。
     r = r.json()  # requests帮你做了 loads (JSON字符串 -> dict)
+    """
+    response.json()是把响应里的 JSON 文本解析成 Python 对象。一般是 dict 或 list。eval() = 执行代码，危险很多
+    python几乎所有东西都是对象，不同对象，取值方式不同：
+    dict：常用 [] / .get()
+    list：常用 [index]
+    自定义对象/库对象：常用 .
+    """
     if 'errors' in r:
         raise RuntimeError(r['errors'])
     return r['data']['getLegalEntityList']['total']
