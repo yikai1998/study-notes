@@ -1,0 +1,59 @@
+# 简单版
+def check(func):
+    def inside(a, b):
+        if b == 0:
+            print('Cannot divide by zero')
+            return 0
+        print('Calculating...')
+        return func(a, b)
+    return inside
+
+@check  # equals div_basic = check(div_basic)
+def div_basic(a, b):
+    return a/b
+
+print(div_basic(5, 0))
+print(div_basic(1005001, 20))
+
+
+# 增加难度
+from functools import wraps
+
+"""
+第一层：拿装饰器参数
+第二层：拿原函数
+第三层：拿调用参数
+"""
+def decorator(param=None):
+    def outer_func(func):
+        @wraps(func)  # wraps 不改变装饰器逻辑，只是让被装饰后的函数看起来仍然像原函数。调试时知道原始函数是谁。
+        def wrapper(*args, **kwargs):
+            for i in args:
+                print(i)
+            for k, v in kwargs.items():
+                print(k, v)
+            if param is not None:
+                print(f'Applying {param} parameter to function {func.__name__}')
+            # 在这里可以添加更多的逻辑，比如检查参数，或者根据param的值改变行为
+            result = func(*args, **kwargs)
+            print(result)
+            return result
+        return wrapper
+    return outer_func
+
+# 使用装饰器，且传入参数
+@decorator(param='special behavior')  # equals div_verbose = decorator(param='special behavior')(div_verbose)
+def div_verbose(a, b, *args, **kwargs):
+    return a / b if b != 0 else 'Cannot divide by zero'
+
+div_verbose(490, 80, 'eggs', dinner='noodles')
+打印输出
+"""
+490
+80
+eggs
+dinner noodles
+Applying special behavior parameter to function div_verbose
+6.125
+"""
+返回 6.125
