@@ -1,0 +1,137 @@
+"""
+Python处理文本的25个经典操作
+公众号文章：python学习杂记 2024-06-23
+"""
+
+import os
+
+## 文件的读写
+# mac: "/";  window: "\\"; ~ 是“家目录”的简写，expanduser() 是把这个简写展开成真实路径。
+# 不同操作系统的路径分隔符可能不同，建议使用 os.path.join() 来拼接路径
+desktop = os.path.join(os.path.expanduser("~"), "Desktop")
+print(desktop)
+
+# 打开文件并读取内容 [the file must exist already]
+file_path = os.path.join(desktop, '三字经.txt')
+with open(file=file_path, mode='r', encoding='utf-8') as f:
+    content = f.read()  # read() 适合小文件（十几MB以下都没问题）；如果文件很大，不建议一次性全部读入内存。
+print(content)
+
+# 整体覆盖 [if the file exists, then replace; if not, then would create this file]
+with open(file=os.path.join(desktop, '三字经2.txt'), mode='w', encoding='utf-8') as f:
+    f.write('[如果你看到了这行文字，说明之前的内容全部被我覆盖了]')
+
+# 追加内容在末尾 [if the file does not exist, then it would create the file]
+with open(file=os.path.join(desktop, '三字经3.txt'), mode='a', encoding='utf-8') as f:
+    f.write('这是一行新的内容！\n')
+
+# 读取文件的特定某行，如第3行
+with open(file=os.path.join(desktop, '三字经.txt'), mode='r', encoding='utf-8') as f:
+    for i, line in enumerate(f, start=1):
+        if i == 3:
+            print(line)
+            break
+    或：
+    lines = f.readlines()
+    if len(lines) >= 3:
+        print(lines[2])
+    else:
+        print('文件不足3行')
+
+"""
+read 一次性读取整个文件的内容，将其作为一个字符串返回。
+每次调用 readline 方法时，它会从文件的当前指针位置开始读取一行，并返回该行的字符串。行的末尾通常包括一个换行符 \n，除非在最后一行没有换行符。
+连续调用 readline() 会接着往下读，不会每次都从第一行开始。
+readlines 读取文件中的所有行，并将它们作为一个列表返回，其中每一行是一个列表元素，行末包含换行符。
+read 适合读取较小的文件或需要处理整个文件内容为一个字符串的情况，
+readlines() 适合需要一次性拿到所有行列表的情况，
+“逐行处理”，其实更推荐直接： `for line in f:`
+如果文件非常大，考虑使用文件对象的迭代操作来逐行读取文件，以减少内存使用。
+"""
+"""
+处理图片、视频、压缩包、PDF，二进制读写：rb / wb （因为图片、视频这些不是“文字内容”）
+处理文字内容：r/w/a
+"""
+
+
+## 文件（夹）操作
+# 列出文件夹当前层级下的所有条目（文件和文件夹）
+# for file in os.listdir('.'):
+for file in os.listdir(desktop):
+    print(file)  # 当前目录下的各个名称，而不是完整路径
+"""
+os.listdir() 只能看当前这一层。如果你想把某个文件夹里面、以及它所有子文件夹里面的文件都找出来，用：os.walk()
+for root, dirs, files in os.walk('A'):
+    for file in files:
+        print(os.path.join(root, file))
+# A/1.txt
+# A/B/2.txt
+"""
+"""
+找所有的text文件
+files = [f for f in os.listdir('.') if f.endswith('.txt')]
+等效
+files = glob.glob('*.txt')  # 在当前工作目录下，找所有 .txt 文件
+"""
+
+# 获取文件大小
+print(os.path.getsize(os.path.join(desktop, '三字经_copy.txt')))
+
+# 检查路径是否存在(适用于文件/文件夹)
+print(os.path.exists(os.path.join(desktop, '三字经_copy.txt')))
+print(os.path.exists(os.path.join(desktop, 'newFolder2')))
+# 如果你想区分文件和文件夹，可以进一步用：
+os.path.isfile(path)
+os.path.isdir(path)
+
+# 确认文件行数
+with open(file=os.path.join(desktop, 'newFolder2', '新三字经.txt'), mode='r', encoding='utf-8') as f:
+    line_count = sum(1 for line in f)
+print(line_count)
+
+# 复制文件内容，并写入新文件
+with open(file=os.path.join(desktop, '三字经.txt'), mode='r', encoding='utf-8') as ff, open(file=os.path.join(desktop, '三字经_copy.txt'), mode='w', encoding='utf-8') as ff_copy:
+    ff_copy.write(ff.read())
+# 如果是“复制文件”这个动作，更推荐用：`shutil.copyfile(src, dst)` 更直接，也更符合“复制文件”的语义
+
+# 创建多级目录
+os.makedirs(os.path.join(desktop, 'newFolder2', 'test'), exist_ok=True)
+# 如果 newFolder2 or test 已经是目录，不会报错。
+# exist_ok=True 只解决一种错 - 目录已存在而导致的 FileExistsError。没法解决 “同名位置已经是“文件”，不是目录” / “权限不足” / “路径非法”
+
+""" 
+os.mkdir() 
+This function is used to create a single directory level. 
+It does not create nested directories; if the parent directory does not exist, it will raise a FileNotFoundError. 
+
+os.makedirs('mydir/subdir1/subdir2')
+os.makedirs will create mydir, mydir/subdir1, and mydir/subdir1/subdir2, creating all necessary intermediate directories. 
+If any of these directories already exist and exist_ok is not set to True, it will raise a FileExistsError. 
+很多时候只用 makedirs(..., exist_ok=True) 完全可以
+"""
+
+# 重命名或移动文件
+src = os.path.join(desktop, '三字经.txt')
+dst = os.path.join(desktop, 'newFolder2', '新三字经.txt')
+os.rename(src, dst)
+# 如果 newFolder2\新三字经.txt 已经存在（windows），会 FileExistsError。
+# 如果不存在，会移动&重命名文件。
+# shutil.move()
+
+# 删除文件
+# os.remove(os.path.join(desktop, '三字经_copy.txt'))
+
+# 删除文件夹
+# os.rmdir(os.path.join(desktop, 'newFolder2', 'test'))
+
+""" 
+os.rmdir(): 
+This function is used to remove a single directory. 
+It can only remove empty directories. If the directory contains any files or subdirectories, os.rmdir will raise an OSError. 
+It does not work on files; trying to use os.rmdir on a file will raise an error. 
+
+os.remove(): 
+This function is used to remove a file or a symbolic link. 
+It cannot remove directories, even if they are empty. If you try to use os.remove on a directory, it will raise an OSError. 
+It is designed to work with files and symbolic links, not directories. 
+"""
