@@ -46,6 +46,7 @@ def search_datacenter(legal_entity_id=None, account_id=None, token=None):
     return r['data']['getLegalEntityList']['total']
 
 def datacenter_decorator(func):
+    @wraps(func)  # 不然 get_tm_case.__name__ 会变成 wrapper
     def wrapper(*args, **kwargs):
         account_id = kwargs.get('account_id')
         legal_entity_id = kwargs.get('legal_entity_id')
