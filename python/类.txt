@@ -1,0 +1,52 @@
+什么是类
+类是由属性和方法构成的，是创建对象的模板，python中用__init__的方法，来初始化实例属性。
+在实例化对象时，Python 会先创建实例，然后自动调用该类的 __init__ 方法对实例进行初始化。
+__init__ 会为实例设置初始化时需要的属性。
+
+self 代表当前实例对象本身。
+通过 self.属性名 可以访问当前对象的属性，
+通过 self.方法名() 可以在类的内部调用当前对象的其他实例方法。
+
+class HumanCreation:
+    def __init__(self, name, gender):
+        self.name = name  # 人都是有名字的
+        self.gender = gender  # 人都是有性别的
+
+    # 定义一个吃饭的方法
+    def eat(self):
+        print(f'{self.name} is having food now.')
+
+    # 定义一个看电视的方法
+    def watching_tv(self, channel):
+        print(f'{self.name} is watching the {channel} on TV.')
+
+    # 让当前这个对象先调用 eat()，再调用 watching_tv()
+    def relax(self):
+        self.eat()
+        self.watching_tv('sports')
+
+    def go_wc(self):
+        if self.gender == 'male':
+            print(f'{self.name} is a man, so he should go to the male toilet.')
+        elif self.gender == 'female':
+            print(f'{self.name} is a woman, so she should go to the female toilet.')
+        else:
+            print('Unknown gender.')
+
+
+person_1 = HumanCreation(name='Ben Chen', gender='male')
+print(person_1.name, person_1.gender)
+person_1.eat()
+person_1.watching_tv(channel='cartoon')
+person_1.go_wc()
+
+person_2 = HumanCreation(name='Kitty Li', gender='female')
+print(person_2.name, person_2.gender)
+person_2.eat()
+person_2.watching_tv(channel='news')
+person_2.go_wc()
+
+一定要有__init__方法吗？ 如果不初始化会怎么样
+类不一定必须写 __init__ 方法。不写时，类依然可以实例化；但如果实例方法中访问了未提前绑定的属性，就会报 AttributeError。
+如果不把对象的共性信息保存为实例属性，那么在调用方法时就可能反复传入相同参数，代码可读性和封装性都会变差。
+
