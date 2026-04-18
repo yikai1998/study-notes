@@ -1,0 +1,128 @@
+Synchronous - 同步 （任务发出去之后，你要不要一直等结果？要等。）
+调用后通常要等待结果返回，再继续下一步；流程常表现为顺序执行。
+
+Asynchronous - 异步（任务发出去之后，你要不要一直等结果？先不等，结果好了再通知。）
+发起任务后不用原地等待，结果好了再通知你继续处理。
+异步不一定同时做很多事，但调用方不会被阻塞。 
+
+并发：多个任务一起往前推进，并发不一定同一时刻真一起跑。（A任务做一下，B任务做一下，大家都在推进）
+并行：多个任务在同一时刻真正同时执行。（A和B真的同时有人在做）
+
+process - 进程（一个独立的应用程序）
+有自己的内存空间
+相互之间独立
+
+thread - 线程（process里的工作人员）
+一个进程可以有多个线程
+所有的线程共享同一个内存空间，可以同时执行不同的任务
+
+它们不是互斥关系，可以组合出现：单线程同步、单线程异步、多线程并发、多进程并行……
+
+用进程池的典型场景
+Example 1：大数据/图片/加密/视频处理
+每个ID是一张图片，要进行复杂的计算（如人脸识别、加密）。
+这类任务通常是 CPU 密集型。对纯 Python 重计算来说，多线程通常效果不好，一般优先进程池。
+Example 2：Selenium、Chrome自动化、或Pyppeteer等浏览器
+每个ID开一个浏览器（背后是Chrome/Edge独立进程），互相不干扰。
+浏览器自动化这类任务通常更吃资源，也更容易遇到稳定性问题，所以很多时候会优先考虑多进程。
+Example 3：科学数值运算、机器学习
+每个 ID 都在做重运算时，通常优先考虑进程池。
+
+用线程池的典型场景
+假设有10个人要各自去窗口A办手续，然后再去窗口B。原来你让1个人办完A、等结果、再去B，10个顺序慢慢来；
+现在你让他们排成队同时去A窗口，各自等自己的结果（比如用10个线程），谁A完成谁去B，这样总时间比“排队”要快了好多倍！
+Example 1：API批量爬取
+每个ID去GET/POST一个远端接口，主要时间都在“等服务器返回”，本地CPU很空闲。
+用线程池能迅速发起N个“等”动作，CPU压力小。
+Example 2：网络批量下载/上传文件
+比如要下载1000个图片、视频，主要时间都在等下载完成，而不是靠CPU计算。
+线程池超高效！
+Example 3：文件批量读写、数据库批量入库
+大多数时间都在等外部硬盘或数据库响应，不是本地算力瓶颈。
+线程池即可！
+
+concurrent.futures是 Python 标准库里一个并发执行工具，主要提供两种池：
+ThreadPoolExecutor：线程池
+ProcessPoolExecutor：进程池
+它帮你做的是：
+把任务提交出去
+让线程或进程去执行
+用 Future 对象表示“这个任务未来会有结果”
+让你统一拿结果、等结果、处理异常
+所以它主要解决的是：“我有很多任务，想交给线程池或进程池并发执行，怎么统一管理？
+
+concurrent.futures直接覆盖了“线程 / 进程”这部分。
+用线程池时，通常是在做并发。
+用进程池时，常常也能实现更接近真正的并行，尤其是 CPU 密集任务。
+但它不是“并发/并行”这个概念本身，它只是实现手段之一。
+它不是传统意义上最核心的 async/await 那套异步框架。
+concurrent.futures：更偏线程池 / 进程池并发
+asyncio：更偏单线程事件循环异步，通常一个线程里用事件循环管理很多等待中的请求
+
+线程池示例：适合 IO 密集任务
+```py
+# 线程池的例子（IO密集型，比如API批量采集）
+import concurrent.futures
+import requests
+
+ids = ['id1', 'id2', 'id3', 'id4']
+def fetch_apiA(id_):
+    return requests.get(f'https://httpbin.org/get?id={id_}').json()
+with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+    results = list(executor.map(fetch_apiA, ids))  # 任务形式简单、只想批量跑一遍。结果按输入顺序返回。
+
+
+with concurrent.futures.ThreadPoolExecutor(max_workers=3) as ex:
+    futures = [
+    ex.submit(ab.get_cle_details, dc='', token=token, account_id=None, legal_entity_id=cid)
+    for cid in cle_ids
+    ]
+    results = [f.result() for f in concurrent.futures.as_completed(futures)]  # 谁先做完，谁先返回。更适合做异常处理、超时控制、动态收集结果。
+```
+
+进程池示例：适合 CPU 密集任务
+进程池一定加if __name__ == '__main__'，因为进程池会启动新的 Python 进程。
+如果不加保护，某些系统下子进程可能会重复执行主脚本，导致无限递归创建进程，最后把 CPU、内存打爆。
+```py
+import concurrent.futures
+import hashlib
+
+def cpu_task(data):
+    for _ in range(10**7):
+        data = hashlib.sha256(data).digest()
+    return data[:8]
+
+if __name__ == '__main__':
+    ids = [b'apple', b'banana', b'cherry', b'date']
+    with concurrent.futures.ProcessPoolExecutor(max_workers=4) as executor:
+    results = list(executor.map(cpu_task, ids))
+    for item in results:
+    print(item)
+```
+
+一、并发数越大就越快吗？
+理论上——不是！分3种情况：
+1. 小数量（比你机器CPU/硬盘/带宽低），并发数越大越快
+比如你有8核，线程/进程开到8及以内，能同时干活，充分利用多核或带宽。
+2. 超过临界点后，再大就不快了，反而更慢
+你有8核，却开了16、32、99个进程，系统要切换调度、线程间相互抢资源，反而增加"排队"、“上下文切换”、内存消耗，导致效率变低！
+网络/带宽也是，如果你有10M网速，2个下载和20个下载，20个未必更快，可能还超时/被ban。
+3. 极大的时候，还可能挂掉/崩溃
+内存耗尽、网络被ban、服务器拒绝服务、进程池/线程池爆了。
+
+二、线程池/进程池，怎么选最大的数字？
+- 进程池（Process）
+通常和你的物理CPU核心（os.cpu_count()）一致或者略微多一两个（如果任务有IO混合）。
+如果任务全是CPU算力（如图片计算等），你多开没用，8核最好就开8个。
+- 线程池（Thread）
+IO任务可以开得比CPU核多很多，比如100、200都不奇怪（只要没把对方服务器干趴）。
+但不是越多越好，超过带宽/系统调度能力，也会有性能下降、副作用。
+重度IO场景一般20-100都够用，要靠实际测试、看任务时间/数量/资源。
+
+三、用例直观体验
+比如下载一个网页需要1秒，下载50个网页，线程池设置为：
+1个线程，耗时50秒（串行）
+10个线程，耗时约5~6秒（开销+网络抖动）
+100个线程，也许只需1~2秒，“极快”，但有的任务会被丢弃/被服务器ban/你带宽爆掉变慢
+1000个线程，可能反而更慢，或者502/掉线
+CPU计算同理，每个核只能干活一个，超多就是挤在门口。
