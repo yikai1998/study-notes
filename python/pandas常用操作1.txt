@@ -1,12 +1,7 @@
-# coding=gbk
-
 """
 公众号文章:早起python 2023-04-14
-
 在数据分析和数据建模的过程中需要对数据进行清洗和整理等工作，有时需要对数据增删字段。下面为大家介绍pandas对数据的复杂查询、数据类型转换、数据排序、数据的修改、数据迭代 以及 函数的使用
 """
-
-import pandas as pd
 
 # 源数据
 df = pd.read_excel('模拟数据.xlsx', sheet_name='期末考试')
@@ -29,6 +24,7 @@ print(df.loc[(df.分数 > 95) & (df['班级'] == '1班'), '生日':'科目'])  #
 
 # 1.3函数筛选
 print(df.姓名[lambda s: min(s.index)])  # 最小索引位置对应的姓名
+这种写法属于“炫技”，可读性极差。直接用 df.loc[0, '姓名'] 或 df.iloc[0]['姓名'] 才是正道
 print(max(df.分数.index))  # 最大索引值
 print(df.姓名[df.index == 20])  # 索引=20对应的姓名
 print(df[df.index == 20])  # 索引=20对应的所有记录
@@ -109,7 +105,9 @@ print(df.replace({'分数': {100: 150, 90: 120}}))  # 将分数列中的100替�
 
 # 4.3填充空值
 print(df.fillna('none'))  # 将空值全部改成'none'
-print(df.fillna(method='ffill'))  # 将空值全部用前一行的值填充; ffill为前向填充，bfill是后向填充
+# method 参数在 fillna 中已不推荐使用。 # print(df.fillna(method='ffill'))  # 将空值全部用前一行的值填充; ffill为前向填充，bfill是后向填充
+df.ffill()  # 前向填充
+df.bfill()  # 后向填充
 
 valuemap = {'分数': 60, '期中分数': 80, '生涯平均分': 80}
 print(df.fillna(value=valuemap))  # 自定义为各列空值填充不同的缺失值
@@ -159,11 +157,13 @@ df.loc[df.shape[0]] = {'姓名': '本内特', '分数': 97}  # 方法2 自动在
 # 4.10追加合并
 df = pd.DataFrame([[1, 2], [3, 4]], columns=list('AB'))
 df2 = pd.DataFrame([[101, 102, 103], [103, 104, 105]], columns=list('ABC'))
-print(df.append(df2).reset_index())  # 类似UNION ALL的向下拼接，如果值有缺失则显示NaN
+# df.append() 在新版本中已不存在，强行运行会报错 # print(df.append(df2).reset_index())  # 类似UNION ALL的向下拼接，如果值有缺失则显示NaN
+df = pd.concat([df, df2], ignore_index=True)  # 纵向堆叠两个表
 
 # 4.11删除
 print(df.pop('姓名'))
 print(df)  # 删除了“姓名”列
+实际工作中 99% 的情况都在用 df.drop(columns=['列名'])，因为它更灵活，支持同时删多列
 
 # 4.12删除空值
 print(df.dropna())  # 一行中只要有至少一个NaN，就会删掉这行
@@ -176,6 +176,7 @@ print(df.dropna(thresh=9))  # Keep only the rows with at least 9 non-NA values.
 
 
 # 06 数据迭代
+在 Pandas 中，“循环”是效率杀手。除非你在做非常复杂的字符串处理或调用第三方 API，否则永远优先考虑向量化操作
 
 # 6.1迭代series
 for i in df.姓名:
@@ -186,11 +187,12 @@ for i, n, q, t in zip(df.index, df.班级, df.姓名, df.年龄):
 
 # 6.2df.itertuples()
 for i in df.itertuples():
-    print(i, i[2], i[4])  # 以行为维度循环输出，形式为元组tuple
+    print(i.姓名, i.分数)  # 以行为维度循环输出，形式为元组tuple
 
 # 6.3df.iterrows()
 for index, i in df.iterrows():
     print(index, i['姓名'])  # 以行为维度循环输出，可以指定相应的列字段值
+# iterrows() 极慢，因为它会将每一行转化为 Series。如果只是为了修改数据，优先使用 df['列名'] = ... 这种向量化操作
 
 # 6.4df.items()
 for label, i in df.items():
@@ -209,7 +211,7 @@ for i in df:
 # 7.2apply()
 df = df.年龄.apply(lambda x: x+100)  # 把函数应用到某列
 
-# 7.3applymap()
+# 7.3applymap() -- Series 没有 applymap 方法，但为了统一 Series 和 DataFrame 的操作，applymap 已演变为 map
 def mylen(x):
     return len(str(x))
 df = df.applymap(lambda x: mylen(x))  # 把函数应用到所有元素中
