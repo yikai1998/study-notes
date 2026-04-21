@@ -1,0 +1,163 @@
+>> search user id
+from slack_sdk import WebClient
+import os
+import certifi
+import pandas as pd
+os.environ['SSL_CERT_FILE'] = certifi.where()
+SLACK_USER_TOKEN = 'token'
+client = WebClient(token=SLACK_USER_TOKEN)
+def get_all_users():
+    users = []
+    cursor = None  # 用于分页的游标
+    while True:  # 持续循环，直到获取所有用户
+        response = client.users_list(cursor=cursor)
+        if response['ok']:
+            users.extend(response['members'])  # 添加当前页的用户
+            # 获取下一页的 cursor
+            cursor = response.get('response_metadata', {}).get('next_cursor')
+            if not cursor:
+                break
+        else:
+            break
+    return users
+employees = get_all_users()
+# 打印用户数量
+print(f'Total Users: {len(employees)}')
+df_result = pd.DataFrame(columns=['slack_user_id', 'emp_name', 'emp_real_name'])
+# 打印用户信息
+for emp in employees[:10]:
+    if not emp['deleted']:
+        df_result.loc[len(df_result)] = {
+            'slack_user_id': emp.get('id'),
+            'emp_name':  emp.get('name'),
+            'emp_real_name': emp.get('real_name'),
+        }
+        # 少量数据可以，大量用户时效率不高。更推荐先收集到 list，再一次性建 DataFrame：
+        # rows = []; rows.append({...}); df_result = pd.DataFrame(rows);
+# 输出
+print(df_result)
+
+
+>> batch invitation
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
+import os
+import certifi
+os.environ['SSL_CERT_FILE'] = certifi.where()
+SLACK_BOT_TOKEN = 'token'
+CHANNEL_ID = 'C08FD1U7J3H'  # Replace with your Slack channel ID
+USER_IDS = ['U02KLQGEQLV']  # Replace with Slack User IDs
+client = WebClient(token=SLACK_BOT_TOKEN)
+def invite_users(channel_id, user_ids):
+    try:
+        response = client.conversations_invite(channel=channel_id, users=','.join(user_ids))
+        print('Successfully invited users:', response)
+    except SlackApiError as e:
+        print(e)
+        print(f"Error inviting users: {e.response['error']}")
+# Invite Users to the Channel
+invite_users(CHANNEL_ID, USER_IDS)
+
+
+>> flexibly generate the mention list
+prefix_mention_map = {
+    'HK-CIMC': ['U056EVDANKE', 'U057FESTY9X'],  # CHING-IP MAYBLE-CHENG
+    'HK-CIK': ['U056EVDANKE', 'U027EJ13C0Z'],  # CHING-IP KOALA
+}
+mention_users = []
+unique_utms = set(df['utm_campaign'].dropna())
+for utm in unique_utms:
+    for utm_start, utm_poc in prefix_mention_map.items():
+        if utm.startswith(utm_start):
+            mention_users.extend(utm_poc)
+mention_users = list(set(mention_users))
+
+def df_to_slack_block_mention(user_ids=['U02KLQGEQLV', 'UR0STDE9F']):
+    # generate slack mention queue
+    rich_text_elements = []
+    for i, uid in enumerate(user_ids):
+        rich_text_elements.append({'type': 'user', 'user_id': uid})
+        if i != len(user_ids) - 1:
+            rich_text_elements.append({'type': 'text', 'text': ' '})
+    block = {
+        'type': 'rich_text',
+        'elements': [
+            {
+                'type': 'rich_text_section',
+                'elements': rich_text_elements
+            }
+        ]
+    } 
+    
+    return block
+
+
+>> flexibly generate the table
+# convert the pandas dataframe to be slack table block rows
+def df_to_slack_block_table(df):
+    rows = []
+    header_row = []
+    for col in df.columns:
+        header_row.append({
+            'type': 'rich_text',
+            'elements': [{
+                'type': 'rich_text_section',
+                'elements': [{
+                    'type': 'text',
+                    'text': str(col),
+                    'style': {'bold': True}
+                }]
+            }]
+        })
+    rows.append(header_row)
+    for _, row in df.iterrows():
+        data_rows = []
+        for cell in row:
+            data_rows.append({
+                'type': 'rich_text',
+                'elements': [{
+                    'type': 'rich_text_section',
+                    'elements': [{
+                        'type': 'text',
+                        'text': str(cell)
+                        }]
+                }]
+            })
+        rows.append(data_rows)
+    block = {
+        'type': 'table',
+        'rows': rows
+    }
+
+    return block
+
+
+>> combine different blocks
+table_b = df_to_slack_block_table(df=df)
+intro_b = {
+    'type': 'rich_text',
+    'elements': [
+        {
+            'type': 'rich_text_section',
+            'elements': [
+                {
+                    'type': 'text',
+                    'text': f'HKSEA whitelist channel partner RFI notification report, {today}:'
+                }
+            ]
+        }
+    ]
+}
+mention_b = df_to_slack_block_mention(user_ids=mention_users)
+payload_blocks = [intro_b, {'type': 'divider'}, table_b]
+if mention_users:
+    payload_blocks.extend([{'type': 'divider'}, mention_b])
+payload = {'blocks': payload_blocks}
+
+
+>> connect with slack to send msg
+url = 'xxx'
+headers = {'Content-Type': 'application/json'}
+response = requests.post(url, json=payload, headers=headers, timeout=10)
+response.raise_for_status()
+result = response.json()
