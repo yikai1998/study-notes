@@ -1,13 +1,7 @@
-# coding=gbk
-
 """
 公众号文章:法纳斯特 2022-01-22
 整理了90个Pandas案例，强烈建议收藏
 """
-
-import datetime
-import pandas as pd
-import numpy as np
 
 
 # 01 如何使用列表和字典创建Series
@@ -25,7 +19,7 @@ ser3 = pd.Series(['A']*4 + ['V']*5)
 ser4 = pd.Series(
     {'China': 'Beijing',
      'Japan': 'Tokyo',
-     'Korea': 'Soul'}
+     'Korea': 'Seoul'}
 )
 
 # 02 如何使用Numpy函数创建Series
@@ -104,6 +98,7 @@ print(df3.loc[df3['Age'].isin([24, 25])])
 print(df3.loc[~df3['Age'].isin([24, 25])])
 
 # 13 迭代DataFrame的行和列
+性能差，能向量化就别循环
 df3 = pd.DataFrame({
     'EmpCode': ['Emp001', 'Emp002', 'Emp003', 'Emp004', 'Emp005'],
     'Name': ['John Doe', 'William Spark', 'Thomas Edison', 'Mark Johns', 'Harris Mac'],
@@ -220,7 +215,9 @@ print(df3.iloc[2:4])  # 前闭后开，即第三行 至 第四行
 print(df3.iloc[4::-1])  # 从第五行 至 第一行 依次one by one输出
 
 # 24 iloc和loc的区别
-# loc索引器可以进行布尔选择；iloc也可以复制他，但不能将它传递给一个布尔系列，必须将布尔系列转换为numpy数组
+# loc 用按标签对齐的布尔 Series，iloc 用按位置的布尔数组
+loc 会按索引标签 a b c 去对齐，即使顺序乱了也行，会先按标签对齐，再筛选。这是“给带名字的行打勾”
+iloc 只理解成：第1行取，第2行不取，第3行取。它不看索引名，只看位置。这是“按从上到下的位置打勾”
 df3 = pd.DataFrame(
     data={'EmpCode': ['Emp001', 'Emp002', 'Emp003', 'Emp004', 'Emp005'],
           'Name': ['John Doe', 'William Spark', 'Thomas Edison', 'Mark Johns', 'Harris Mac'],
@@ -302,7 +299,7 @@ print(df8)
 # 31 如何把dates列转换为DateTime类型
 # 跳过 .astype('datetime64')
 
-# 32 两个DataFrame相加
+# 32 两个DataFrame纵向追加/拼接
 df1 = pd.DataFrame({
     'Name': ['张三', '李四', '王五'],
     'Age': [23, 23, 25],
@@ -348,7 +345,7 @@ print(df)
 
 # 36 在DataFrame顶部添加一行
 df = pd.DataFrame({
-    'Name': ['赵六', '董大'],
+    'Name': ['赵六', '董事'],
     'Job': ['会计', '演员']
 })
 line = pd.DataFrame({
@@ -384,6 +381,8 @@ print(df)
 df = df1._append(df2).fillna(0)
 df = pd.concat([df1, df2]).fillna(0)
 df = df.combine_first(df1).combine_first(df2).fillna(0)
+DataFrame.append() 不推荐，用 pd.concat()
+_append() 也属于内部/过渡接口，不建议教学笔记作为主写法
 
 # 42 获取行和列的平均值
 df = pd.DataFrame([[10, 20, 30, 40], [7, 14,21,28], [5, 5, 0, 0]],
@@ -420,21 +419,9 @@ print(df['Employee'])
 # 48 查找包含某字符串的所有行
 # 跳过 同上；  OR的关系用 "|"
 
-# 49 如果行中的值包含字符串，则创建与字符串相等的另一侧 - outdated 20241225
-# df = pd.DataFrame({
-#     'EmpCode': ['001', '002', '003', '004', '005'],
-#     'Name': ['John', 'Doe', 'William', 'Spark', 'Ben'],
-#     'Occupation': ['Chemist', 'Accountant', 'Statistician', 'Statistician', 'Programmer'],
-#     'Date of Join': ['2018-12-04', '2021-12-12', '2010-09-12', '2010-03-01', '2011-01-03'],
-#     'Age': [23, 23, 34, 34, 34]
-# })
-# df['Department'] = pd.np.where(df.Occupation.str.contains("Chemist"), "化学家",
-#                                pd.np.where(df.Occupation.str.contains("Statistician"), "数据分析家",
-#                                            pd.np.where(df.Occupation.str.contains("Programmer"), "程序员",
-#                                                        "啥都不是")))
-# print(df)
+# 49 pd.np.where 已废弃，不能再推荐
 
-# 50 计算pandas group中每组的行数
+# 50 分组聚合统计
 df = pd.DataFrame([[10, 20, 30, 40],
                    [7, 14, 21, 28],
                    [5, 5, 0, 0],
@@ -444,6 +431,7 @@ df = pd.DataFrame([[10, 20, 30, 40],
                   columns=['Apple', 'Orange', 'Rice', 'Oil'],
                   index=['Basket1', 'Basket2', 'Basket3', 'Basket4', 'Basket5', 'Basket6'])
 print(df)
+先取这四列，按 Apple 列分组，对每组里的 Orange / Rice / Oil / Apple 做：平均值 mean，个数 count，总和 sum
 print(df[['Apple', 'Orange', 'Rice', 'Oil']].groupby(['Apple']).agg(['mean', 'count', 'sum']))
 
 # 51 检查字符串是否在DataFrame中
@@ -455,7 +443,7 @@ print(df[['Apple', 'Orange', 'Rice', 'Oil']].groupby(['Apple']).agg(['mean', 'co
 # 53 计算DataFrame列的不同值
 df = pd.DataFrame({'Age': [30, 30, 29, 29, 23, 22, 12, 33, 23],
                    'Height': [170, 192, 193, 178, 165, 159, 159, 195, 188]})
-print(df.Age.value_counts())
+print(df.Age.value_counts())  # Age 这一列里，每个值出现了几次
 
 # 54 删除具有重复索引的行
 df = pd.DataFrame({'Age': [30, 30, 29, 29, 23, 22, 12, 33, 23],
@@ -510,7 +498,7 @@ print(df_1)
 # 跳过 df.sort_index(ascending=False)
 
 # 66 按降序对列进行排序
-# 跳过 df.sort_index(axis=1. ascending=False) # 效果是各列将按照列名从左至右降序排列
+# 跳过 df.sort_index(axis=1, ascending=False) # 效果是各列将按照列名从左至右降序排列
 
 # 67 使用 rank方法查找DataFrame中元素的排名
 df = pd.DataFrame([[10, 120, 30, 40], [7, 14, 221, 28], [5, 5, 0, 0]],
@@ -536,7 +524,7 @@ print(df.sort_index(ascending=True))
 values = ["India", "Canada", "Australia",
           "Japan", "Germany", "France"]
 # pidx = pd.period_range('2015-01-01', periods=6, freq='w')
-pidx = pd.period_range('2015-01-01', periods=6, freq='+8d')
+pidx = pd.period_range('2015-01-01', periods=6, freq='8D')
 df = pd.DataFrame(values, index=pidx, columns=['Country'])
 print(df)
 
@@ -617,15 +605,33 @@ print(df.pct_change()[:5]) # Percent change at each cell of a DataFrame
 
 # 88 在 Pandas 中使用非分层索引使用 Stacking
 # 89 使用分层索引对 Pandas 进行拆分
-df = pd.DataFrame([[10, 30, 40], [], [15, 8, 12],
-                   [15, 14, 1, 8], [7, 8], [5, 4, 1]],
-                  columns=['Apple', 'Orange', 'Banana', 'Pear'],
-                  index=['Basket1', 'Basket2', 'Basket3', 'Basket4',
-                         'Basket5', 'Basket6'])
-print(df)
-print(df.stack(level=-1))  # Because the Index here has only 1 level，n_th; 等于是把列的维度塞到index的“栈”里
-print(df.stack(level=-1).unstack(level=-1))
-print(df.stack(level=-1).unstack(level=-2))
+stack() 把列“压”到行索引里去。（宽 -> 窄）
+unstack() 把行索引中的某一层“展开”回列。（窄 -> 宽）
+level 真正有用的场景：多层列索引
+stack(level=0)：压列索引第 0 层
+stack(level=1)：压列索引第 1 层
+stack(level=-1)：压最后一层
+unstack(level=-1)：展开最后一层行索引
+
+df2 = pd.DataFrame(
+    [
+        [10, 30, 40, 80],
+        [20, 25, 35, 90]
+    ],
+    columns=pd.MultiIndex.from_tuples([
+        ('Fruit', 'Apple'),
+        ('Fruit', 'Orange'),
+        ('Score', 'Banana'),
+        ('Score', 'Pear')
+    ]),
+    index=['Basket1', 'Basket2']
+)
+这里列索引有两层：
+第 0 层：Fruit / Score
+第 1 层：Apple / Orange / Banana / Pear
+
+df2.stack(level=-1)  # 把 Apple / Orange / Banana / Pear，压到行索引里去了，列还保留 Fruit / Score
+df2.stack(level=0)  # 把 Fruit / Score，压到行索引里去了，列变成 Apple / Orange / Banana / Pear
 
 # 90 Pandas 获取 HTML 页面上 table 数据
 # 跳过 Pandas 获取 HTML 页面上 table 数据
