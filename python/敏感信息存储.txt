@@ -1,0 +1,30 @@
+写入 .env 文件
+  把敏感内容写到.env文本中，不让它进到版本控制（加进.gitignore。在项目根目录创建一个文件，名字叫“.gitignore”，里面写你不想上传的内容，比如“.env 换行 *.log 换行 *.pyc”，push的时候git 会自动忽略）。
+  利用 python-dotenv 读取配置，方便管理敏感信息，也能避免把密钥直接写死在代码里。
+  环境切换时只改.env内容，无需动代码。
+  
+
+.env 并不是操作系统意义上的“文件类型”。
+它只是一个普通的纯文本文件，名字叫“.env”，约定俗成地被配置管理或库文件（如 python-dotenv）识别和加载。
+
+环境变量命名约定通常是：全大写, 用下划线, 不用横杠
+```sample in .env
+JIRA_SERVER=https://airwallex.atlassian.net
+JIRA_SEARCH_API=https://airwallex.atlassian.net/rest/api/3/search/jql
+JIRA_USER=ben.chen@airwallex.com
+JIRA_TOKEN=your_token_here
+```
+
+```sample in python
+import os
+from dotenv import load_dotenv  # pip install python-dotenv
+
+basedir = os.path.dirname(os.path.abspath(__file__))  # 当前.py所在路径
+env_path = os.path.join(basedir, '..', '..', 'workspace', '.env')  # 从当前 .py 所在目录出发，往上两层，再进入 workspace 文件夹，再找 .env 文件
+load_dotenv(env_path)
+jira_username = os.getenv('JIRA_USER')
+jira_token = os.getenv('JIRA_TOKEN')
+if jira_username is None or jira_token is None:
+    raise ValueError('Missing JIRA_USER or JIRA_TOKEN in .env')
+
+```
