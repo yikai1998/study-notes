@@ -1,19 +1,18 @@
-# coding=gbk
-
 """
 公众号：科学随想录 2023-08-13
 
 **kwargs的原理
 **kwargs是python中的一种语法，它允许函数接受任意数量的关键字参数，这些参数在函数内部作为字典dic处理，字典的键是参数名，值是传递给函数的参数值；
+**kwargs 只是约定俗成，不是强制名字（**data也完全合法）
+**kwargs 很灵活，但会降低函数签名的清晰度。能明确写出的参数，优先明确写；只有在确实需要扩展或透传参数时，再用 **kwargs。
 """
 
 
 # 简单示例
 def greet(**kwargs):
-    print(kwargs.items())
+    print(kwargs.items())  # kwargs.items() 返回的是可迭代视图，不是列表
     for key, value in kwargs.items():
         print(f'{key}: {value}')
-
 
 greet(name='Alice', age=29, height=160.9, male=False, mailbox=None)
 # output
@@ -27,20 +26,17 @@ greet(name='Alice', age=29, height=160.9, male=False, mailbox=None)
 
 # **kwargs的应用场景
 # **kwargs在各种场景下都非常有用，尤其是在处理复杂的函数参数和创建灵活的api时
+# 调用时可以额外传入新的关键字参数，而函数定义不需要为每个新增参数单独写形参
 
 # 动态处理参数
-# 当你不确定函数要接受多少参数，或者参数的数量会随着时间的推移而变化时，可以使用**kwargs，你可以随时添加新的参数，而无需修改函数定义
+# 当你不确定函数要接受多少参数，或者参数的数量会随着时间的推移而变化时，可以使用**kwargs
+# kwargs 本来就是字典
 def create_user(**kwargs):
-    d = {}
-    for key, value in kwargs.items():
-        d[key] = value
-    return d
-
+    return kwargs
 
 user = create_user(name='Tom', age=29, country='USA', occupation='Engineer')
 print(user)
 # output: {'name': 'Tom', 'age': 29, 'country': 'USA', 'occupation': 'Engineer'}
-
 
 # 扩展现有函数
 # 假设你有一个函数，该函数已经接受了一些参数，但现在你想要扩展这个函数，以便它可以接受更多的参数
@@ -49,7 +45,6 @@ def employee_details(name, age, **kwargs):
     print(f'Age: {age}')
     for key, value in kwargs.items():
         print(f'{key}: {value}')
-
 
 employee_details('Alice', 33, country='China', height=192)
 # output
@@ -61,13 +56,13 @@ employee_details('Alice', 33, country='China', height=192)
 
 # 与*args一起使用
 # 可以同时使用*args和**kwargs，以接受任意数量的位置参数和关键字参数
+# 顺序：位置参数 -> *args -> 关键字专用参数 -> **kwargs
 def func(*args, **kwargs):
-    for arg in args:
+    for arg in args:  # args 是元组
         print(arg)
-    for key, value in kwargs.items():
+    for key, value in kwargs.items():  # kwargs 是字典
         print(f'{key}: {value}')
-        
-        
+
 func('arg1', 'arg2', 3, weather='spring', time='a.m', speed=5)
 # output
 # arg1
@@ -78,9 +73,15 @@ func('arg1', 'arg2', 3, weather='spring', time='a.m', speed=5)
 # speed: 5
 
 
-# temp sample
+# sample
 def build_model(blood, magic, gender, name='dead king', *args, **kwargs):
-    sp = kwargs.get('speed')
+    # blood 普通参数
+    # magic 普通参数
+    # gender 普通参数
+    # name 普通参数，但是有默认值，我可以选择不传
+    # *args 收集后面多出来的位置参数
+    # **kwargs 收集多出来的关键字参数，必须放在参数列表最后
+    sp = kwargs.get('speed', 0)
     print(blood)
     print(magic)
     print(gender)
@@ -89,9 +90,18 @@ def build_model(blood, magic, gender, name='dead king', *args, **kwargs):
     print(kwargs)
     print(sp)
     return 0
-
+# 这里为什么没有关键字专用参数
+# 因为 *args 后面直接就是 **kwargs 了，中间没有普通名字参数。
+# 如果你写成这样 def build_model(blood, magic, gender, name='dead king', *args, speed, **kwargs):
+# 这里的 speed 才是关键字专用参数。调用时必须这样：build_model(300, 150, 'M', 'mountain king', 'apple', speed=100, attack=999)
+# 目的是 希望调用时更清晰，不想让别人随便靠位置乱传
 
 build_model(300,  150, 'M', 'mountain king', 'apple', 'work work', speed=100, attack=999)
+"""
+前 4 个位置参数先分配给 blood, magic, gender, name
+剩下的两个位置参数进 args
+剩余的关键字参数（如 speed=100, attack=999）进入 kwargs
+"""
 # 300
 # 150
 # M
@@ -99,3 +109,15 @@ build_model(300,  150, 'M', 'mountain king', 'apple', 'work work', speed=100, at
 # ('apple', 'work work')
 # {'speed': 100, 'attack': 999}
 # 100
+
+
+# 解包调用
+"""
+*args、**kwargs 在函数定义里，通常是在封包
+*列表、**字典 在函数调用里，通常是在解包
+"""
+def greet(name, age):
+    print(name, age)
+
+info = {'name': 'Alice', 'age': 29}
+greet(**info)  # **info 会把字典解包为关键字参数，相当于 greet(name='Alice', age=29)
