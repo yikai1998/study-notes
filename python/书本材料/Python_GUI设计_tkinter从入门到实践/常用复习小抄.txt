@@ -1,0 +1,267 @@
+1. 最小模板
+import tkinter as tk
+from tkinter import ttk, messagebox
+tk：基础组件直接够用
+ttk：外观更现代，常用于 Combobox / Treeview / Progressbar / Button
+
+root = tk.Tk()
+root.title('app')
+root.geometry('400x300')
+
+root.mainloop()
+
+2. 基本规律
+- 创建组件：组件 = tk/ttk.组件(父容器, 参数...)
+- 显示组件：pack() / grid() / place()
+- 改内容或样式：config(...)
+- 获取内容：get()
+- 绑定点击：command=函数名
+- 绑定键鼠事件：bind('<事件>', 函数)
+
+3. 布局
+常用：
+- pack()：简单上下/左右排，页面块状排版
+- grid()：表单、输入框最常用
+不建议常用：
+- place()：固定坐标，后期难维护
+
+规则：
+- 同一个父容器里不要混用 pack 和 grid
+- 想混用就加 Frame 分区
+
+4. 窗口
+root = tk.Tk()
+root.title('标题')
+root.geometry('宽x高')
+root.config(bg='white')
+
+子窗口：
+top = tk.Toplevel(root)
+
+5. 最常用组件
+
+[1] Label
+label = tk.Label(root, text='Hello')
+label.pack()
+
+常用参数：
+text, fg, bg, font
+
+改内容：
+label.config(text='新内容')
+
+[2] Button
+def submit():
+    print('clicked')
+
+btn = tk.Button(root, text='提交', command=submit)
+btn.pack()
+
+注意：
+- 写 command=submit
+- 不要写 command=submit()
+
+[3] Entry
+entry = tk.Entry(root)
+entry.pack()
+
+常用：
+entry.get()
+entry.insert(0, 'abc')
+entry.delete(0, 'end')
+
+密码输入：
+tk.Entry(root, show='*')
+
+[4] Text 多行输入、日志输出
+text = tk.Text(root, width=40, height=10)
+text.pack()
+
+常用：
+text.get('1.0', 'end')
+text.insert('end', 'hello\n')
+text.delete('1.0', 'end')
+
+记忆：
+- '1.0' = 第1行第0列
+- 'end' = 结尾
+
+[5] Frame 分区、解耦布局
+frame = tk.Frame(root)
+frame.pack()
+
+tk.Label(frame, text='A').pack()
+
+用途：
+- 分区
+- 避免 pack / grid 冲突
+
+6. 常用选择组件
+
+[1] Radiobutton 单选
+gender = tk.StringVar(value='男')
+
+tk.Radiobutton(root, text='男', variable=gender, value='男').pack()
+tk.Radiobutton(root, text='女', variable=gender, value='女').pack()
+
+取值：
+gender.get()
+
+[2] Checkbutton 多选
+agree = tk.BooleanVar(value=False)
+
+tk.Checkbutton(root, text='同意', variable=agree).pack()
+
+取值：
+agree.get()
+
+[3] Combobox 下拉框
+city = ttk.Combobox(root, values=['北京', '上海', '广州'], state='readonly')
+city.pack()
+city.current(0)
+
+取值：
+city.get()
+
+绑定选择事件：
+def on_select(event):
+    print(city.get())
+
+city.bind('<<ComboboxSelected>>', on_select)
+
+7. 推荐布局模板
+
+[1] 简单上下排：pack
+tk.Label(root, text='用户名').pack()
+tk.Entry(root).pack()
+tk.Button(root, text='提交').pack()
+
+[2] 表单：grid
+tk.Label(root, text='用户名').grid(row=0, column=0, padx=5, pady=5, sticky='e')
+tk.Entry(root).grid(row=0, column=1, padx=5, pady=5)
+
+tk.Label(root, text='密码').grid(row=1, column=0, padx=5, pady=5, sticky='e')
+tk.Entry(root, show='*').grid(row=1, column=1, padx=5, pady=5)
+
+tk.Button(root, text='登录').grid(row=2, column=0, columnspan=2, pady=10)
+
+8. 事件绑定
+鼠标键盘事件用 bind
+
+def on_key(event):
+    print(event.keysym)
+
+root.bind('<Key>', on_key)
+
+常用事件：
+<Button-1>           鼠标左键单击
+<Double-Button-1>    鼠标左键双击
+<Return>             回车
+<Key>                任意键
+
+注意：
+- bind 对应函数要接收 event 参数
+
+9. messagebox
+messagebox.showinfo('提示', '保存成功')
+messagebox.showwarning('警告', '输入有误')
+messagebox.showerror('错误', '出错了')
+
+ok = messagebox.askyesno('确认', '确定删除吗？')
+
+10. after 定时
+def task():
+    print('执行一次')
+
+root.after(1000, task)
+
+循环执行：
+def loop():
+    print('tick')
+    root.after(1000, loop)
+
+11. Treeview 列表/表格展示
+tree = ttk.Treeview(root, columns=('name', 'age'), show='headings')
+tree.heading('name', text='姓名')
+tree.heading('age', text='年龄')
+tree.insert('', 'end', values=('张三', 18))
+tree.pack()
+
+常用：
+item_id = tree.focus()
+tree.item(item_id)
+tree.delete(item_id)
+
+12. Progressbar 进度条
+bar = ttk.Progressbar(root, mode='determinate', maximum=100, value=30)
+bar.pack()
+
+更新：
+bar['value'] = 60
+
+13. 文件选择
+from tkinter import filedialog
+
+path = filedialog.askopenfilename()
+save_path = filedialog.asksaveasfilename(defaultextension='.txt')
+folder = filedialog.askdirectory()
+
+14. 变量类型
+tk.StringVar()    字符串
+tk.BooleanVar()   布尔
+tk.IntVar()       整数
+
+常见搭配：
+- Radiobutton
+- Checkbutton
+- Combobox
+
+15. 最常用套路
+
+[1] 输入 -> 按钮 -> 输出
+def submit():
+    value = entry.get()
+    label.config(text=value)
+
+[2] 清空输入框
+entry.delete(0, 'end')
+
+[3] 清空文本框
+text.delete('1.0', 'end')
+
+[4] 获取下拉框值
+combo.get()
+
+16. 最容易错的点
+- command=函数名，不要加()
+- bind 的函数要写 event
+- 同一个父容器别混用 pack 和 grid
+- 项目里通常只保留一个 Tk()，弹窗用 Toplevel()
+- place 能少用就少用
+- Text 取全文：text.get('1.0', 'end')
+
+17. 一个够用的小例子
+import tkinter as tk
+from tkinter import ttk, messagebox
+
+def submit():
+    name = entry.get().strip()
+    if not name:
+        messagebox.showwarning('提示', '请输入名字')
+        return
+    result.config(text=f'你好，{name}')
+
+root = tk.Tk()
+root.title('demo')
+root.geometry('300x180')
+
+tk.Label(root, text='姓名').grid(row=0, column=0, padx=10, pady=10, sticky='e')
+entry = tk.Entry(root)
+entry.grid(row=0, column=1, padx=10, pady=10)
+
+tk.Button(root, text='提交', command=submit).grid(row=1, column=0, columnspan=2, pady=10)
+
+result = tk.Label(root, text='')
+result.grid(row=2, column=0, columnspan=2)
+
+root.mainloop()
