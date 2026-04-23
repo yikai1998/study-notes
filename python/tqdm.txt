@@ -1,0 +1,118 @@
+from tqdm import tqdm
+import time 
+from multiprocessing import Pool # 多进程
+
+# Introduction
+tqdm is a fast, extensible progress bar for Python and CLI (Command Line Interface).  
+It's an open-source project that can be used to add a visual progress meter to loops and other iterative processes.  
+It's particularly useful for long-running tasks where you want to give users feedback on the progress of the operation. 
+
+# Sample1
+for i in tqdm(range(20), desc='processing'):
+    time.sleep(1)
+
+# Sample2 - cowork with Pools
+def do_work(x):
+    time.sleep(1)
+    return x**x
+"""
+it's considered best practice to include `if __name__ == "__main__": ` when:
+Defining or Creating Multiprocessing Pools: to ensure cross-platform compatibility and prevent execution issues.
+Writing Reusable Code or Libraries: use it to prevent code from being executed unintentionally when your script is imported as a module in other scripts.
+process 那边基本必须加，thread 那边通常不用，但统一加上是好习惯。
+"""
+if __name__ == '__main__':
+    with Pool(4) as p:
+        list(tqdm(p.imap(do_work, range(20)), total=len(range(20))))
+
+# map v.s. imap v.s. imap_unordered
+map
+    Return all results after all tasks complete.
+    Use when you want the full result list at the end.
+imap
+    Return an iterator and yield results progressively.
+    Use when you want to consume results one by one, e.g. with tqdm.
+imap_unordered
+    Similar to imap, but result order is not guaranteed.
+    Use when order does not matter.
+
+# Basic Parameters of tqdm
+desc: A string to label the progress bar.
+total: The total number of iterations. 如果 tqdm 包的是 range/list 这类，不用手动写，如果包的是生成器、imap 返回值这类，自己写。
+unit: The unit of each iteration (e.g., 'it', 'batch', 'epoch', 'file'). 
+dynamic_ncols: Boolean. Adjust the width of the bar based on the terminal window size. 
+mininterval: The minimum update interval in seconds (e.g., 0.1 means the bar will update at least every 0.1 seconds).
+ncols: The width of the entire bar in columns. 
+leave: After the task is completed, should the progress bar line be left in the terminal? Default True.
+bar_format: A custom format for the bar string (e.g., {l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}]). 
+
+# how to make the description in tqdm be auto updated dynamically
+# Sample1
+with tqdm(total=20, desc='processing') as pb:
+    for i in range(20):
+        pb.set_description(f'updating {i}')  # set_description() 只改左侧标题，如果想显示更丰富的实时信息，很多时候 set_postfix() 更合适。
+        time.sleep(1)
+        pb.update(1)  # 只修改进度计数，不会影响实际任务执行逻辑
+
+# Sample2
+def do_work(x): 
+    time.sleep(1)  # Simulate some work 
+    return x * x 
+
+if __name__ == '__main__': 
+    with tqdm(total=20, desc="Processing") as pbar: 
+        for i, result in enumerate(map(do_work, range(20))):  # 此处只是普通串行 内置函数map罢了
+            pbar.update(1)  # Update the progress bar by 1 step 
+            pbar.set_postfix(idx=i+1, result=result)  # 右边附加信息
+
+# Sample3 - 配合 multiprocessing.Pool （这套现在依然能用，也不算过时）
+with Pool(4) as p:
+    with tqdm(total=20, desc="Processing") as pbar:
+        # Pool.map 和 Pool.imap 的结果内容通常相同，顺序也相同；
+        # 区别是 map 一次性返回，imap 边迭代边返回，更适合配合 tqdm
+        for i, result in enumerate(p.imap(do_work, range(20))):
+            pbar.update(1)
+            pbar.set_postfix(idx=i+1, result=result)
+
+# Sample4 - 用 tqdm.contrib.concurrent 最省事
+一行代码就能让 concurrent.futures 的并发任务带进度条，且不需要自己维护 pbar.update()
+在内部就是一次性 executor.map，它天生没有 imap 的“边算边 yield”能力（不具备 imap 的“流式消费”能力）。
+只是在内部把 tqdm 包在一次性 map 上，返回值 确实是最终 list，但 进度条更新 是随着任务完成推进的，不是最后一次性动完。
+
+from tqdm.contrib.concurrent import thread_map, process_map
+
+# 线程池示例
+results = thread_map(
+    your_func,          # 要并发的函数
+    iterable,           # 可迭代对象
+    max_workers=8,      # 等价于 ThreadPoolExecutor(max_workers=8)
+    desc="Processing"   # 进度条描述
+)
+
+# 进程池示例（CPU 密集）
+results = process_map(
+    your_func,
+    iterable,
+    max_workers=4,
+    desc="Processing"
+)
+
+def fetch_record(x):
+    time.sleep(0.2)   # 模拟请求接口 / 读文件
+    return f"record-{x}"
+
+def heavy_compute(x):
+    s = 0
+    for i in range(100000):
+        s += i * x
+    return s
+
+items = range(20)
+
+# IO 密集：适合线程
+results1 = thread_map(fetch_record, items, max_workers=8, desc="Fetching")
+
+# CPU 密集：适合进程
+if __name__ == "__main__":
+    items = range(20)
+    results = process_map(heavy_compute, items, max_workers=4, desc="Computing")
