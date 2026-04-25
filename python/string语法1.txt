@@ -1,6 +1,3 @@
-# coding=gbk
-
-"""
 公众号文章：法纳斯特 2022-01-01
 python字符串格式化语法较多，不便记忆，可以在具体需要使用的时候再查询即可；
 推荐使用str.format()或f-string格式化处理字符串；
@@ -9,7 +6,6 @@ python字符串格式化语法较多，不便记忆，可以在具体需要使�
     2. str.format()格式化
     3. f-string格式化
     4. format()
-"""
 
 
 # %格式化
@@ -17,7 +13,6 @@ python字符串格式化语法较多，不便记忆，可以在具体需要使�
 # 简单示例
 print("%040.8f 是%s" % (-34.125, '刚学的数字'))  # output: -000000000000000000000000000034.12500000 是刚学的数字
 
-'''  
 "%[(name)][flags][width][.precision]type" % 待格式化数据  
 %是占位符  
 (name)可以用来命名占位符 
@@ -27,7 +22,6 @@ flags选填
     空格, 右对齐 正数无正号 负数加负号  
     0, 右对齐 用0填充 正数无正号 负数加负号 负号在0的最左侧  
   
-
 width是你希望这个占位符的占位宽度 如果指定的宽度小于原始宽度则按照原长度输出；如果大于 则可以结合flags里的对齐规则  
 .precision是小数点后保留的位数 或字符串切片  
 s string 字符串  
@@ -42,7 +36,6 @@ c character 将十进制数转换为对应的Unicode值 如97转换为a
 ** 涉及四舍五入 可以使用python标准模块decimal模块下的Decimal类进行处理 [防止 四舍六入五双, 二进制53位强行截断, ...]  
 from decimal import Decimal, ROUND_HALF_UP  
 print(Decimal("1.125").quantize(Decimal(".00"), rounding=ROUND_HALF_UP))  >>> 1.13  
-'''
 
 # 其他示例
 print('my name is %(name)s, l am %(age)d years old' % {'name': 'Yikai Chen', 'age': 25})  # output: my name is Yikai Chen, l am 25 years old
@@ -54,7 +47,6 @@ print('repeat my name, %(name)s %(name)s %(name)s' % {'name': 'Yikai Chen'})  # 
 # 简单示例
 print('|我叫{}, 今年{}岁.|'.format('汤姆', 18))  # output: |我叫汤姆, 今年18岁.|
 
-''' 
 "{[index][:[[fill]align][sign][#][0][width][grouping_option][.precision][type]]}".format() 
 index 待格式化的键/索引 如果占位符数量和参数数量不一样，则必须指定索引 
 fill 用作填充的字符 可以是任何字符 
@@ -71,8 +63,7 @@ width 字段总宽度
 .precision 
     整数型是不允许设置precision的，如果设置了 会被强制转换成浮点数 
     浮点型表示小数点后面显示几位小数 
-    字符型表示截取几个字符 
-'''
+    字符型表示截取几个字符
 
 # 其他示例
 print('My name is {0}, and my age is {1}.'.format('Zack', 28))  # output: My name is Zack, and my age is 28.
@@ -106,11 +97,10 @@ print(f'l usually watch {channel.upper()} to learn English.')  # output: l usual
 
 
 # format()
-''' 
+
 format()是python的一个内置函数，其使用频率不高，语法和str.format()大同小异，可以结合lambda函数使用或在其它一些特定情况下使用 
 # x是需要格式化的数据， formatter是格式化表达式 不需要加{} 
 format(X, formatter) 
-'''
 
 # 简单示例
 nums = [1, 2, 3]
