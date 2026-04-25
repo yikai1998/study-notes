@@ -1,10 +1,7 @@
-# coding=gbk
-import re
-
-"""
 公众号文章：法纳斯特 2022-01-16
 31个最重要的内置字符串方法
-"""
+
+import re
 
 # slicing切片 按照一定条件从列表或元组中取出部分元素
 wording = ' hello '
@@ -26,19 +23,19 @@ print('www.baidu.com!!'.strip('m!o.cw'))  # baidu
 print('python hello python'.removeprefix('py'))  # thon hello python
 # removesuffix() 同上原理，移除后缀
 
-# replace() 将字符串中的内容替换成指定内容
+# replace() 将字符串中的内容替换成指定内容, 默认是全部替换, 也可以传第三个参数限制次数
 print('string methods in python'.replace(' ', '-'))  # string-methods-in-python
 
 # re.sub()
 print(re.sub('\s+', '-', 'substitution    methods in python'))  # substitution-methods-in-python
 
-# split() 对字符串做分隔处理，返回一个列表，默认按照空格
+# split() 对字符串做分隔处理，返回一个列表，默认按任意连续空白字符分割，比如空格、制表符、换行
 print('string in python'.split())  # ['string', 'in', 'python']
 print('string in python'.split(','))  # ['string in python']
 print('string in python'.split(' ', maxsplit=1))  # ['string', 'in python']
 # rsplit()是从右侧开始对字符串进行分隔
 
-# string.join(seq) 是以string作为分隔符 将seq中所有的元素合并为一个新的字符串，必须是字符
+# string.join(seq) 是以string作为分隔符 将seq中所有的元素合并为一个新的字符串，必须是字符串
 print('-'.join(['my', 'age', 'is', '19']))  # my-age-is-19
 
 # upper(), lower(), capitalize()
