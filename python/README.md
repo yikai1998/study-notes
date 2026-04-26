@@ -1,5 +1,39 @@
-# py-Learning
-this repo is initially built for self learning use, as well as provides insights for any other python users;
-it includes many python related basic knowledges, which could be friendly for new guys, but also acts as referential library;
+# Python Learning Notes (Python学习笔记)
 
+这是一个记录 Python 学习过程中的知识点和代码示例的仓库。
 
+## 📚 目录结构
+
+### 基础知识
+- **基础0.txt** - 菜鸟时期的大杂烩
+- **基础1.txt** - Python 魔法函数（map、filter、装饰器、生成器、解包等）
+- **基础2.txt** - Python 高级技巧（列表切片、yield、字典处理、循环else等）
+- **基础3.txt** - Python 高级遍历技巧（列表推导式、字典推导式、zip、enumerate等）
+- **基础4.txt** - Python 字典的 20 种神奇用法
+- **基础5.txt** - 递归缓存和性能优化
+
+### 工作经验
+### 书本材料
+### Pandas
+### Matplotlib
+
+---
+
+## 💡 使用方式
+
+1. 每个文件独立成章，可按需查阅
+2. 代码示例都可以直接运行测试
+3. 适合作为 Python 基础速查手册
+
+---
+
+## 🚀 特色
+
+- ✅ 覆盖 Python 基础到进阶内容
+- ✅ 代码示例丰富，即学即用
+- ✅ 包含常见坑点和最佳实践
+- ✅ 既适合初学者，也适合进阶查阅
+
+---
+
+**说明**：这是个人学习笔记，持续完善中，欢迎参考和补充！
