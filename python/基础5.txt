@@ -1,4 +1,3 @@
-# coding=gbk
 from functools import cache  # help you avoid repeated computations
 
 
