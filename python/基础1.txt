@@ -1,9 +1,5 @@
-# coding=gbk
-
-"""
 python魔法函数
 公众文章：手把手PythonAI编程 2024-06-23
-"""
 
 
 # map 对iterable中的每个元素应用该函数，返回一个迭代器
