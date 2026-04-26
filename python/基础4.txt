@@ -1,9 +1,6 @@
-# coding=gbk
-"""
 一次搞懂 Python 字典！Python字典的20种神奇用法
 公众号：软件测试圈
 2024-06-28
-"""
 
 # 创建字典
 my_dic = {'Name': 'Ben Chen', 'Age': 26, 'Nationality': 'China', 'Gender': 'M'}
