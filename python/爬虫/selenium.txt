@@ -1,0 +1,97 @@
+# 固定起手
+from selenium import webdriver                  # 导入 webdriver
+from selenium.webdriver.chrome.options import Options  # Chrome 配置项
+
+driver = webdriver.Chrome()                    # 启动 Chrome
+driver = webdriver.Edge()                      # 启动 Edge
+driver = webdriver.Firefox()                   # 启动 Firefox
+
+opts = Options()                               # 创建 Chrome 配置
+opts.add_argument('--headless=new')            # 无头模式
+opts.add_argument('--window-size=1440,900')    # 设置窗口大小
+opts.add_argument('--disable-gpu')             # 禁用 GPU
+driver = webdriver.Chrome(options=opts)        # 按配置启动 Chrome
+
+# 打开 / 关闭页面
+driver.get('https://example.com')              # 打开网页
+driver.refresh()                               # 刷新页面
+driver.back()                                  # 后退
+driver.forward()                               # 前进
+driver.close()                                 # 关闭当前标签页
+driver.quit()                                  # 关闭整个浏览器
+
+# 元素操作
+from selenium.webdriver.common.by import By
+driver.find_element(By.ID, 'kw')               # 按 id 找一个元素 (首选，最快最稳，前提是 id 稳定)
+driver.find_element(By.NAME, 'q')              # 按 name 找一个元素 (表单元素常用，比如搜索框) Google 搜索框常见就是 name='q'
+driver.find_element(By.CLASS_NAME, 'btn')      # 按 class 找一个元素
+driver.find_element(By.TAG_NAME, 'input')      # 按标签名找一个元素
+driver.find_element(By.CSS_SELECTOR, '.btn')   # 按 CSS 选择器找一个元素 (通用方案，灵活、清晰、速度通常不错)
+driver.find_element(By.XPATH, '//input')       # 按 XPath 找一个元素 (复杂关系定位时再用)
+driver.find_elements(By.CSS_SELECTOR, '.item')   # 找多个元素
+driver.find_elements(By.XPATH, '//div[@class="item"]')   # XPath 也能找多个
+driver.find_elements(By.CLASS_NAME, 'item')      # class 也能找多个
+driver.find_elements(By.TAG_NAME, 'a')           # tag 也能找多个
+elem.click()                                   # 点击元素
+elem.send_keys('hello')                        # 输入内容
+elem.clear()                                   # 清空输入框
+elem.submit()                                  # 提交表单 更像“提交 form” 用得没以前多
+elem.text                                      # 获取元素文本
+elem.get_attribute('href')                     # 获取属性值
+elem.get_attribute('value')                    # 获取 input 的值
+elem.is_displayed()                            # 元素是否可见
+elem.is_enabled()                              # 元素是否可用
+elem.is_selected()                             # 元素是否被选中
+
+# 键盘操作
+from selenium.webdriver.common.keys import Keys
+elem.send_keys('abc')                          # 输入文字
+elem.send_keys(Keys.ENTER)                     # 回车
+elem.send_keys(Keys.TAB)                       # Tab
+elem.send_keys(Keys.ESCAPE)                    # Esc
+elem.send_keys(Keys.BACKSPACE)                 # 退格
+elem.send_keys(Keys.CONTROL, 'a')              # Ctrl + A
+elem.send_keys(Keys.CONTROL, 'c')              # Ctrl + C
+elem.send_keys(Keys.CONTROL, 'v')              # Ctrl + V
+
+# 等待
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+wait = WebDriverWait(driver, 10)               # 最多等待 10 秒
+wait.until(EC.presence_of_element_located((By.ID, 'kw')))         # 等元素出现在 DOM(元素已经存在于页面结构里 ≠ 可见 ≠ 可点击)
+wait.until(EC.visibility_of_element_located((By.ID, 'kw')))       # 等元素可见
+wait.until(EC.element_to_be_clickable((By.ID, 'kw')))             # 等元素可点击
+wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'item'))) # 等多个元素出现
+wait.until(EC.url_contains('search'))          # 等 URL 包含某内容
+wait.until(EC.title_contains('Google'))        # 等标题包含某内容
+
+# JavaScript 执行
+driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")  # 滚动到页面底部
+driver.execute_script("arguments[0].click();", elem)                      # 用 JS 点击元素
+driver.execute_script("return document.title;")                           # 执行 JS 并返回结果
+
+# cookie
+driver.get_cookies()                           # 获取所有 cookies
+driver.get_cookie('name')                      # 获取指定 cookie
+driver.add_cookie({'name': 'a', 'value': '1'})# 添加 cookie
+driver.delete_cookie('name')                   # 删除指定 cookie
+driver.delete_all_cookies()                    # 删除全部 cookies
+
+# iframe
+driver.switch_to.frame(0)                      # 按索引切入 iframe
+driver.switch_to.frame('frame_name')           # 按 name/id 切入 iframe
+driver.switch_to.frame(elem)                   # 按元素切入 iframe
+driver.switch_to.default_content()             # 回到主文档
+driver.switch_to.parent_frame()                # 回到上一层 frame
+
+# 页面滚动
+driver.execute_script("window.scrollTo(0, 500);")                 # 滚动到指定位置
+driver.execute_script("window.scrollTo(0, document.body.scrollHeight);") # 滚动到底部
+driver.execute_script("arguments[0].scrollIntoView();", elem)     # 滚动到元素位置
+
+# 获取页面状态
+driver.execute_script('return document.readyState')  # 获取页面加载状态
+complete  => 页面加载完成
+loading   => 正在加载
+interactive => DOM 已解析
+
