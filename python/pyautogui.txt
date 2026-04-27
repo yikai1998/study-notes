@@ -1,0 +1,36 @@
+# PyAutoGUI 本质上就是用 Python 模拟人操作鼠标键盘
+import pyautogui
+
+# 安全开关
+pyautogui.FAILSAFE = True   # 鼠标移到左上角可强制中断
+
+# 鼠标操作
+pyautogui.moveTo(500, 300, duration=0.5)   # 移动到坐标
+pyautogui.click()                          # 单击
+pyautogui.doubleClick()                    # 双击
+pyautogui.rightClick()                     # 右键
+pyautogui.scroll(-500)                     # 向下滚
+print(pyautogui.position())                # 当前鼠标位置
+
+# 键盘操作
+pyautogui.write("hello", interval=0.1)
+pyautogui.press("enter")  # enter shift ctrl tab esc backspace f1 f12
+pyautogui.press("backspace", presses=5, interval=0.1)
+pyautogui.keyDown("shift")  # 按住不放
+pyautogui.keyUp("shift")
+pyautogui.hotkey("shift", "a")  # A
+pyautogui.hotkey("command", "c")   # macOS 复制
+pyautogui.hotkey("ctrl", "c")  # Windows 复制
+
+# 屏幕找图 confidence 通常需要安装 opencv-python (Open Source Computer Vision Library，是一个跨平台的计算机视觉库)
+# macOS 可能要给“辅助功能 / 屏幕录制”权限
+btn1 = pyautogui.locateOnScreen("button.png", region=(0, 0, 800, 600), confidence=0.8)
+btn2 = pyautogui.locateOnScreen("button.png", confidence=0.8)
+if btn1:
+    pyautogui.click(pyautogui.center(btn1))
+
+# 屏幕截图
+img = pyautogui.screenshot()
+img.save("screen.png")
+img = pyautogui.screenshot(region=(0, 0, 300, 400))
+
