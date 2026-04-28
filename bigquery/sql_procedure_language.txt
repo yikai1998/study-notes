@@ -1,0 +1,83 @@
+DECLARE
+用于声明变量。
+如果没有 DEFAULT，默认值是 NULL。
+```
+DECLARE x INT64;
+DECLARE d DATE DEFAULT CURRENT_DATE();
+```
+
+SET
+用于给变量赋值。
+```
+SET x = 10;
+```
+
+BEGIN ... END
+表示一个代码块。
+在块里声明的变量，只在这个块里有效。
+```
+DECLARE x INT64 DEFAULT 10;
+BEGIN
+DECLARE y INT64;
+SET y = x;
+SELECT x, y;
+END;
+```
+
+IF
+用于条件判断。
+```
+IF x > 5 THEN
+SELECT 'x is greater than 5';
+ELSE
+SELECT 'x is 5 or smaller';
+END IF;
+```
+
+CASE
+用于多条件分支判断。
+```
+CASE
+WHEN x > 5 THEN
+SELECT 'greater';
+WHEN x = 5 THEN
+SELECT 'equal';
+ELSE
+SELECT 'smaller';
+END CASE;
+```
+
+LOOP
+循环执行，直到遇到 LEAVE。
+```
+DECLARE x INT64 DEFAULT 0;
+LOOP
+SET x = x + 1;
+IF x >= 3 THEN
+LEAVE;
+END IF;
+END LOOP;
+SELECT x;
+```
+
+REPEAT
+重复执行，直到条件成立。
+```
+DECLARE x INT64 DEFAULT 0;
+REPEAT
+SET x = x + 1;
+UNTIL x >= 3
+END REPEAT;
+SELECT x;
+```
+
+BEGIN ... EXCEPTION
+用于错误处理。
+如果 BEGIN 里的语句报错，就执行 EXCEPTION 里的内容。
+```
+BEGIN
+SELECT 10 / 0;
+EXCEPTION WHEN ERROR THEN
+SELECT @@error.message;
+END;
+```
