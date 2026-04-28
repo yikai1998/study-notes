@@ -1,0 +1,144 @@
+一、核心类型
+1. date 只表示日期：年-月-日
+   from datetime import date
+   d = date(2026, 4, 28)
+2. datetime 表示日期 + 时间
+   from datetime import datetime
+   dt = datetime(2026, 4, 28, 15, 30, 45)
+3. time 只表示时分秒
+   from datetime import time
+   t = time(15, 30, 45)
+4. timedelta 表示时间差
+   from datetime import timedelta
+   delta = timedelta(days=3, hours=5)
+
+二、获取当前时间
+from datetime import date, datetime, timezone
+today = date.today()                      # 今天日期
+now = datetime.now()                      # 当前本地时间
+utc_now = datetime.now(timezone.utc)      # 当前 UTC 时间
+
+三、字符串与时间互转
+1. 字符串 -> datetime
+   from datetime import datetime
+   s = "2026-04-28 15:30:45"
+   dt = datetime.strptime(s, "%Y-%m-%d %H:%M:%S")
+2. datetime -> 字符串
+   s = dt.strftime("%Y-%m-%d %H:%M:%S")
+3. 字符串 -> date
+   from datetime import date, datetime
+   d1 = datetime.strptime("2026-04-28", "%Y-%m-%d").date()
+   d2 = date.fromisoformat("2026-04-28")
+4. ISO 格式
+   dt = datetime.fromisoformat("2026-04-28T15:30:45")  # 解析 ISO 风格字符串
+   s = dt.isoformat()  # 把 date / datetime / time 对象转成“ISO 8601 风格字符串”
+常见格式符：
+%Y 年
+%m 月
+%d 日
+%H 小时(24小时制)
+%M 分钟
+%S 秒
+
+四、日期时间加减
+from datetime import date, datetime, timedelta
+1. 日期加减天数
+   d = date(2026, 4, 28)
+   d + timedelta(days=7)  # timedelta 不能直接处理“月”“年”
+2. datetime 加减小时分钟
+   dt = datetime(2026, 4, 28, 15, 30)
+   dt + timedelta(hours=2)
+3. 计算差值
+   d1 = date(2026, 4, 28)
+   d2 = date(2026, 5, 3)
+   diff = d2 - d1
+   diff.days
+   dt1 = datetime(2026, 4, 28, 10, 0)
+   dt2 = datetime(2026, 4, 28, 12, 30)
+   diff = dt2 - dt1
+   diff.total_seconds()
+
+五、比较与判断区间
+d1 < d2 (date 和 date 比, datetime 和 datetime 比, 且都在同一时区语义下)
+
+六、提取常用字段
+from datetime import datetime, date
+dt = datetime(2026, 4, 28, 15, 30, 45)
+dt.year
+dt.month
+dt.day
+dt.hour
+dt.minute
+dt.second
+dt.weekday()       # 0=周一, 6=周日
+dt.isoweekday()    # 1=周一, 7=周日
+dt.replace(hour=0, minute=0, second=0)   # 改字段，不是加减, 用起来像 trunc
+如果在 pandas 里，更像 trunc 的写法是：
+df["time"].dt.floor("D")   # 向下取到天
+df["time"].dt.floor("H")   # 向下取到小时
+
+七、时间戳
+from datetime import datetime, timezone
+dt = datetime(2026, 4, 28, 15, 30, 45)
+ts = dt.timestamp()  # 从 1970-01-01 00:00:00 UTC 到当前时刻经过了多少秒
+dt_local = datetime.fromtimestamp(ts)  # 2026-04-28 15:30:45
+dt_utc = datetime.fromtimestamp(ts, tz=timezone.utc)  # 2026-04-28 07:30:45+00:00
+
+八、时区处理
+from datetime import datetime, timezone, timedelta
+utc8 = timezone(timedelta(hours=8))
+utc0 = timezone.utc
+dt_utc = datetime.now(utc0)  # 2026-04-28 08:13:05.930505+00:00
+dt_utc8 = dt_utc.astimezone(utc8)  # 2026-04-28 16:13:05.930505+08:00
+
+九、pandas 联动常用场景 (用 .dt 前，列必须先转 datetime)
+import pandas as pd
+1. 字符串列转时间
+   df["time"] = pd.to_datetime(df["time"])
+2. 遇到非法值转 NaT
+   df["time"] = pd.to_datetime(df["time"], errors="coerce")
+3. 指定格式
+   df["time"] = pd.to_datetime(df["time"], format="%Y-%m-%d %H:%M:%S")
+4. 提取年月日
+   df["year"] = df["time"].dt.year  # month day weekday date 
+5. 按时间筛选
+   df[df["time"] >= "2026-04-01"]
+6. 设置时间索引
+   df = df.set_index("time")
+7. 按天/月重采样
+   df.resample("D").sum()
+   df.resample("M").sum()
+8. 生成时间序列
+   pd.date_range("2026-04-01", "2026-04-07", freq="D")
+   pd.date_range(start="2026-04-01", periods=5, freq="H")
+9. 计算时间差
+    (1) 两列相减
+    用于“开始时间 - 结束时间”这种场景
+    df["end"] - df["start"]
+    (2) 一列 diff()
+    用于“当前行 - 上一行”
+    常见于行为日志、连续记录、时序数据
+10. 时间加减
+   df["next_hour"] = df["time"] + pd.Timedelta(hours=1)
+   df["after_7d"] = df["time"] + pd.Timedelta(days=7)
+11. 格式化输出 (strftime 后会变成字符串，不适合继续做时间运算)
+   df["time_str"] = df["time"].dt.strftime("%Y-%m-%d %H:%M:%S")  
+
+十、pandas 时区
+1. 给无时区时间加时区
+   df["time"] = df["time"].dt.tz_localize("Asia/Shanghai")  # 本来就是这个时区，只是补标签
+2. 转换时区
+   df["time"] = df["time"].dt.tz_convert("UTC")  # 已经有时区，转换到另一个时区
+
+十一、常见业务模板
+1. 最近7天数据
+   now = pd.Timestamp.now()
+   recent = df[df["time"] >= now - pd.Timedelta(days=7)]
+2. 按天统计
+   result = df.set_index("time").resample("D")["id"].count()
+3. 提取年月分组
+   df["year_month"] = df["time"].dt.strftime("%Y-%m")
+   result = df.groupby("year_month").size()
+4. 计算相邻行为时间差
+   df = df.sort_values(["user_id", "action_time"])
+   df["gap"] = df.groupby("user_id")["action_time"].diff()
