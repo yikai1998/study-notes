@@ -1,0 +1,40 @@
+SQL
+是语言。
+就是 SELECT、JOIN、GROUP BY、CASE WHEN 这些。
+特点：通用、核心语法各个平台都很像。
+
+BigQuery
+是 Google Cloud 的云数仓 / 查询平台。偏大规模分析, 不是传统关系型数据库
+你在上面写的是 BigQuery SQL。
+特点：适合大规模分析，serverless，偏 OLAP。
+
+Databricks
+是云数据平台，不是语言。不是传统关系型数据库
+你可以在上面写 SQL、Python、PySpark、Scala 等。
+Databricks 上的 SQL 通常是 Databricks SQL / Spark SQL 风格。
+特点：适合数据工程、分析、机器学习，和 Spark 生态关系很近。
+
+Legacy SQL
+是 BigQuery 早期旧语法。
+现在主流是 Standard SQL。
+特点：旧、不推荐，新项目一般不用。
+
+SQL Server
+是 Microsoft 的关系型数据库。
+常用方言叫 T-SQL。
+特点：企业里常见，事务和管理功能强。
+
+MySQL
+是关系型数据库。
+有自己的 SQL 方言。
+特点：常见、轻量、应用广。
+
+Oracle
+是关系型数据库。
+有自己的 SQL / PL/SQL 体系。
+特点：企业级、功能强、传统大型系统常见。
+
+Spark
+不是数据库，是大数据计算引擎。
+Spark SQL 是它处理结构化数据时用的 SQL 风格。
+特点：适合大数据处理和分布式计算。
