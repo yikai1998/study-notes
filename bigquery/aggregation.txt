@@ -1,0 +1,60 @@
+聚合函数（Aggregate Functions）与窗口函数（Window Functions）的主要区别在于：聚合函数会“压缩”结果，而窗口函数会“保留”结果。
+聚合函数写法：
+SELECT test_id, SUM(test_score) AS total FROM ExamTable GROUP BY test_id;
+(结果：每个 test_id 只有一行，显示该组的总分)
+窗口函数（Navigation/Window）写法：
+SELECT test_id, test_score, SUM(test_score) OVER(PARTITION BY test_id) AS total FROM ExamTable;
+(结果：保留所有行，但每一行都会多出一列显示该 test_id 组的总分)
+
+当你把聚合函数当作“窗口函数”使用（即使用了 OVER 子句）时，你不能使用 DISTINCT 或 HAVING 等聚合修饰符。
+因为：数据库引擎会陷入逻辑矛盾：你是想对“当前窗口内的所有行去重后求和”，还是对“每一行计算一个窗口值”？为了避免计算上的歧义和性能灾难，SQL 标准禁止了在窗口函数中使用 DISTINCT。
+
+GROUP BY + 聚合函数 是天生一对。GROUP BY 决定了“怎么切分”，聚合函数决定了“怎么统计每一块”
+
+HAVING vs WHERE：WHERE 过滤的是行，HAVING 过滤的是组。
+
+AGGREGATION_THRESHOLD 过滤掉不满足阈值的组
+```sql
+SELECT WITH AGGREGATION_THRESHOLD OPTIONS(threshold=3, privacy_unit_column=last_name)
+  test_id, COUNT(DISTINCT last_name), AVG(test_score)
+FROM ExamTable GROUP BY test_id;
+```
+
+ANY_VALUE(x [HAVING MAX/MIN y]) 随机取值（忽略 NULL）。配合 HAVING 可实现按特定列排序后取值。
+```sql
+-- 取销售额最高的一行的水果名称
+SELECT ANY_VALUE(fruit HAVING MAX sold) FROM Store;
+
+-- 等价于 MIN_BY/MAX_BY
+SELECT MIN_BY(fruit, price) FROM fruits;
+```
+
+数组聚合
+ARRAY_AGG(x [DISTINCT] [ORDER BY ...]) 将分组内的一列值聚合成数组。
+```sql
+SELECT ARRAY_AGG(DISTINCT x ORDER BY x) FROM vals;
+```
+
+ARRAY_CONCAT_AGG(x) 将多行数组合并为一个长数组。
+```sql
+SELECT ARRAY_CONCAT_AGG(x ORDER BY ARRAY_LENGTH(x)) FROM table;
+```
+
+统计
+COUNT(DISTINCT ...) 会默认忽略null
+```sql
+COUNT(DISTINCT IF(x > 0, x, NULL))
+```
+
+COUNTIF(condition) 统计满足条件的行数
+
+LOGICAL_AND / LOGICAL_OR 对分组内的布尔值进行逻辑与/或运算。
+```sql
+SELECT LOGICAL_AND(x < 3) FROM UNNEST([1, 2, 4]) AS x;
+-- 结果: FALSE
+```
+
+STRING_AGG(x, delimiter) 将多行字符串合并为一个字符串，并指定分隔符。
+```sql
+SELECT STRING_AGG(DISTINCT fruit, " & " ORDER BY fruit) FROM UNNEST([...]);
+```
