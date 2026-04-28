@@ -1,0 +1,113 @@
+1. DML Data Manipulation Language（重点掌握） 
+作用：操作表里的数据 为什么重要：分析师最常用，日常查询、清洗、补数据、更新数据都会用到
+需要掌握：
+SELECT
+INSERT INTO
+UPDATE
+DELETE
+MERGE
+
+简单例子：
+```
+SELECT name, sales
+FROM mydataset.orders;
+
+INSERT INTO mydataset.orders (order_id, name, sales)
+VALUES (1, 'Alice', 100);
+
+UPDATE mydataset.orders
+SET sales = 200
+WHERE order_id = 1;
+
+DELETE FROM mydataset.orders
+WHERE order_id = 1;
+
+MERGE mydataset.target_table T
+USING mydataset.source_table S
+ON T.id = S.id
+WHEN MATCHED THEN
+UPDATE SET T.name = S.name
+WHEN NOT MATCHED THEN
+INSERT (id, name) VALUES (S.id, S.name);
+```
+
+2. DDL Data Definition Language（常用部分要掌握） 
+作用：定义或修改表、视图、函数等对象 为什么重要：分析师经常需要建临时表、结果表、view
+需要掌握：
+CREATE TABLE
+CREATE OR REPLACE TABLE
+CREATE TEMP TABLE
+CREATE VIEW
+CREATE FUNCTION
+DROP TABLE
+TRUNCATE TABLE
+
+简单例子：
+```
+CREATE TABLE mydataset.sales_summary (
+order_id INT64,
+amount NUMERIC
+);
+
+CREATE OR REPLACE TABLE mydataset.sales_summary AS
+SELECT order_id, amount
+FROM mydataset.orders;
+
+CREATE TEMP TABLE tmp_orders AS
+SELECT *
+FROM mydataset.orders
+WHERE amount > 100;
+
+CREATE VIEW mydataset.high_value_orders AS
+SELECT *
+FROM mydataset.orders
+WHERE amount > 1000;
+
+CREATE TEMP FUNCTION AddTax(x NUMERIC)
+RETURNS NUMERIC
+AS (
+x * 1.1
+);
+
+DROP TABLE mydataset.old_table;
+
+TRUNCATE TABLE mydataset.sales_summary;
+```
+
+3. DCL Data Control Language（了解即可） 
+作用：控制权限 为什么重要：分析师不一定亲自配权限，但要看得懂
+需要了解：
+GRANT
+REVOKE
+
+简单例子：
+```
+GRANT SELECT ON TABLE mydataset.orders TO 'user@example.com';
+
+REVOKE SELECT ON TABLE mydataset.orders FROM 'user@example.com';
+```
+
+4. TCL Transaction Control Language（了解基本概念） 
+作用：控制事务 为什么重要：分析师平时不一定常写，但知道事务有助于理解数据一致性
+需要了解：
+BEGIN TRANSACTION
+COMMIT TRANSACTION
+ROLLBACK TRANSACTION
+
+简单例子：
+```
+BEGIN TRANSACTION;
+
+UPDATE mydataset.accounts
+SET balance = balance - 100
+WHERE id = 1;
+
+UPDATE mydataset.accounts
+SET balance = balance + 100
+WHERE id = 2;
+
+COMMIT TRANSACTION;
+
+如果出错，可以：
+ROLLBACK TRANSACTION;
+```
