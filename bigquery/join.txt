@@ -86,7 +86,6 @@ LEFT JOIN UNNEST(arr) ON ...
 这样更安全，不会不小心把原表行丢掉
 
 
-
 Important:
 一对多 join 会放大行数。
 如果 A 一行对应 B 里三行，那么 join 后这行会变成三行。
@@ -96,5 +95,11 @@ SUM()
 AVG()
 去重逻辑
 
+LEFT JOIN UNNEST(o.items) AS item ON TRUE  -- 一个永远成立的条件 （把这行对应展开出来的结果接上来就行，不额外过滤。）
 
+UNNEST 可以配 WITH OFFSET （UNNEST 负责展开，不负责排序）
+```sql
+SELECT id, item, offset
+FROM orders, UNNEST(items) AS item WITH OFFSET AS offset;
+```
 
