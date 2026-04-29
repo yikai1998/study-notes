@@ -1,8 +1,6 @@
-```FIRST_VALUE```  
-```LAST_VALUE```  
+FIRST_VALUE / LAST_VALUE  
 Gets a value for the first/last row in the current window frame.  
-https://cloud.google.com/bigquery/docs/reference/standard-sql/navigation_functions#first_value  
-```
+```sql
 WITH finishers AS
  (SELECT 'Sophia Liu' as name,
   TIMESTAMP '2016-10-18 2:51:45' as finish_time,
@@ -46,10 +44,10 @@ FROM (
  *-----------------+-------------+----------+--------------+------------------*/
 ```
 
-```NTH_VALUE```  
-Returns the value of value_expression at the Nth row of the current window frame, where Nth is defined by constant_integer_expression. Returns NULL if there is no such row.  
-https://cloud.google.com/bigquery/docs/reference/standard-sql/navigation_functions#nth_value  
-```
+NTH_VALUE
+Returns the value of value_expression at the Nth row of the current window frame, where Nth is defined by constant_integer_expression. 
+Returns NULL if there is no such row.  
+```sql
 WITH finishers AS
  (SELECT 'Sophia Liu' as name,
   TIMESTAMP '2016-10-18 2:51:45' as finish_time,
@@ -97,11 +95,10 @@ FROM (
  *-----------------+-------------+----------+--------------+----------------*/
 ```
 
-```LAG```  
-Returns the value of the value_expression on a **preceding** row. 看上面  
+LAG 看上面 
+Returns the value of the value_expression on a preceding row.  
 Changing the offset value changes which preceding row is returned; the default value is 1, indicating the previous row in the window frame.  
-https://cloud.google.com/bigquery/docs/reference/standard-sql/navigation_functions#lag  
-```
+```sql
 WITH finishers AS
  (SELECT 'Sophia Liu' as name,
   TIMESTAMP '2016-10-18 2:51:45' as finish_time,
@@ -138,11 +135,10 @@ FROM finishers;
  *-----------------+-------------+----------+-------------------*/
 ```
 
-```LEAD```  
-Returns the value of the value_expression on a subsequent row. 看下面  
+LEAD 看下面
+Returns the value of the value_expression on a subsequent row.   
 Changing the offset value changes which subsequent row is returned; the default value is 1, indicating the next row in the window frame.  
-https://cloud.google.com/bigquery/docs/reference/standard-sql/navigation_functions#lead  
-```
+```sql
 WITH finishers AS
  (SELECT 'Sophia Liu' as name,
   TIMESTAMP '2016-10-18 2:51:45' as finish_time,
@@ -179,9 +175,9 @@ FROM finishers;
  *-----------------+-------------+----------+-----------------*/
 ```
 
-```PERCENTILE_CONT``` Computes the specified percentile value for the value_expression, with linear interpolation.  
-```PERCENTILE_DISC``` Computes the specified percentile value for a discrete value_expression. The returned value is the first sorted value of value_expression with cumulative distribution greater than or equal to the given percentile value.  
-```
+PERCENTILE_CONT Computes the specified percentile value for the value_expression, with linear interpolation.  
+PERCENTILE_DISC Computes the specified percentile value for a discrete value_expression. The returned value is the first sorted value of value_expression with cumulative distribution greater than or equal to the given percentile value.  
+```sql
 SELECT
   PERCENTILE_CONT(x, 0 RESPECT NULLS) OVER() AS min,
   PERCENTILE_CONT(x, 0.01 RESPECT NULLS) OVER() AS percentile1,
@@ -196,7 +192,7 @@ FROM UNNEST([0, 3, NULL, 1, 2]) AS x LIMIT 1;
  | NULL | 0           | 1      | 2.6          | 3   |
  *------+-------------+--------+--------------+-----*/
 ```
-```
+```sql
 SELECT
   x,
   PERCENTILE_DISC(x, 0 RESPECT NULLS) OVER() AS min,
