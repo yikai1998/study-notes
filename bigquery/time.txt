@@ -1,0 +1,62 @@
+DATE 只有日期，没有时分秒，没有时区
+DATETIME 日期 + 时间，没有时区
+TIMESTAMP 表示一个绝对时间点，和时区相关
+
+CURRENT_DATE 返回当前日期 可以指定时区
+```sql
+SELECT CURRENT_DATE();
+SELECT CURRENT_DATE('UTC+8');
+SELECT CURRENT_DATE('Asia/Shanghai');
+SELECT CURRENT_DATE('+08');
+```
+
+DATE 创建 DATE，或者从 DATETIME / TIMESTAMP 中提取日期部分
+```sql
+SELECT DATE(2016, 12, 25);
+SELECT DATE(DATETIME '2016-12-25 23:59:59');
+SELECT DATE(TIMESTAMP '2016-12-25 22:30:00+08', '+03');  -- 按指定时区取该 timestamp 对应的日期
+```
+
+DATE_ADD 给日期加上时间间隔
+```sql
+SELECT DATE_ADD(DATE '2024-01-01', INTERVAL 7 DAY);
+```
+
+DATE_SUB 同理
+
+DATE_DIFF 返回两个日期之间相差多少个指定单位
+```sql
+SELECT DATE_DIFF(DATE '2024-01-10', DATE '2024-01-01', DAY);
+```
+
+DATE_TRUNC 把日期截断到指定粒度
+```sql
+SELECT DATE_TRUNC(DATE '2017-11-05', WEEK(MONDAY));
+```
+
+EXTRACT 从日期中提取某个部分，比如 YEAR, MONTH, WEEK, ISOWEEK
+```sql
+SELECT
+EXTRACT(YEAR FROM DATE '2024-01-01') AS year,
+EXTRACT(MONTH FROM DATE '2024-01-01') AS month;
+```
+
+FORMAT_DATE 把 DATE 格式化成 STRING
+https://cloud.google.com/bigquery/docs/reference/standard-sql/format-elements#format_elements_date_time  
+```sql
+SELECT FORMAT_DATE('%Y-%m-%d', DATE '2008-12-25');
+```
+
+LAST_DAY 返回某个日期所在周期的最后一天，常用于取月末
+```sql
+SELECT LAST_DAY(DATE '2008-11-25', MONTH);
+```
+
+PARSE_DATE 把 STRING 转成 DATE
+```sql
+SELECT PARSE_DATE('%Y%m%d', '20081225');
+```
+
+TIMESTAMP() 里的 timezone，是告诉系统“你给我的原始时间属于哪个时区”
+
+FORMAT_TIMESTAMP() 里的 timezone，是告诉系统“你要按哪个时区显示出来”
