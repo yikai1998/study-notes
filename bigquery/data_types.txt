@@ -1,0 +1,22 @@
+1. 数字类型 (Numeric Types)
+整数 (Integer): INT64 (别名: INT, INTEGER, SMALLINT, BIGINT, TINYINT, BYTEINT)
+定点数 (Fixed-precision 别名: DECIMAL / BIGDECIMAL):
+NUMERIC (别名: DECIMAL) - 38位精度
+BIGNUMERIC (别名: BIGDECIMAL) - 更高精度
+浮点数 (Floating-point): FLOAT64
+
+2. FLOAT64 vs NUMERIC 对比
+FLOAT64: 近似值，有舍入误差，性能极快，适用于科学计算。
+NUMERIC: 精确值，无舍入误差，性能较慢，适用于财务、计费、货币计算。
+```sql
+SELECT SAFE_CAST('123.456' AS NUMERIC) AS my_numeric;
+```
+
+3. 复杂数据结构
+STRUCT: 结构体，一组字段合成的对象（类比 JSON 对象）。
+ARRAY: 数组，一组相同类型的有序值（类比列表）。
+MAP: BigQuery 无原生 MAP 类型，通常使用 ARRAY<STRUCT<key, value>> 或 JSON 类型模拟。
+UNNEST: 将 ARRAY 或 STRUCT 展平为多行（类比拆解包裹）。
+
+4. BOOL, STRING, BYTES, ...
+https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types
