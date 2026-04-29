@@ -97,7 +97,7 @@ AVG()
 
 LEFT JOIN UNNEST(o.items) AS item ON TRUE  -- 一个永远成立的条件 （把这行对应展开出来的结果接上来就行，不额外过滤。）
 
-UNNEST 可以配 WITH OFFSET （UNNEST 负责展开，不负责排序）
+UNNEST 可以配 WITH OFFSET （UNNEST 是把数组展开，不负责排序；WITH OFFSET 可以拿到数组元素的位置）
 ```sql
 SELECT id, item, offset
 FROM orders, UNNEST(items) AS item WITH OFFSET AS offset;
