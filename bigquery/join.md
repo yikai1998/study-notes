@@ -1,14 +1,100 @@
-The ```USING``` clause in SQL, including BigQuery, offers a more concise and readable way to specify join conditions, but it comes with some limitations compared to the ```ON``` clause as it is only useful when the columns used in the join condition have the same name in both tables.  
+INNER JOIN 只返回两边能匹配上的行。（JOIN 单独写时，默认是 INNER JOIN，）
+```sql
+SELECT *
+FROM A
+INNER JOIN B
+ON A.id = B.id;
+```
 
----
+LEFT JOIN 返回左表全部行。右表匹配不上时补 NULL。
+```sql
+SELECT *
+FROM A
+LEFT JOIN B
+ON A.id = B.id;
+```
 
-```CROSS JOIN``` can be written implicitly with a comma. This is called a comma cross join.  
-```CROSS JOIN``` does not use a join condition; it combines each row from the first table with each row from the second table.  
+RIGHT JOIN 返回右表全部行。左表匹配不上时补 NULL。
+```sql
+SELECT *
+FROM A
+RIGHT JOIN B
+ON A.id = B.id;
+```
 
----
-https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax#full_join  
-```FULL OUTER JOIN``` (or simply ```FULL JOIN```) returns all fields for all matching rows in both from_items that meet the join condition. If a given row from one from_item doesn't join to any row in the other from_item, the row returns with NULL values for all columns from the other from_item.  
+FULL OUTER JOIN 返回两边全部行。匹配不上时，另一边补 NULL。
+```sql
+SELECT *
+FROM A
+FULL OUTER JOIN B
+ON A.id = B.id;
+```
 
----
+CROSS JOIN 不需要 join condition。左表每一行都和右表每一行组合。
+结果行数通常是：left row count × right row count
+```sql
+SELECT *
+FROM A
+CROSS JOIN B;
+```
 
-While you are using a similar ```FROM ... , UNNEST(...)``` structure in both queries, ***the second query does not exhibit a traditional CROSS JOIN effect. Instead, it utilizes a correlated (or implicit) join to expand nested arrays.***
+Comma cross join
+下面这种写法本质上也是 cross join：
+```sql
+SELECT *
+FROM A, B;  -- 一般不推荐，可读性不如显式写 CROSS JOIN。
+```
+
+ON vs USING
+
+ON 最通用。适合两边 join key 名字不同，或条件更复杂的情况。
+```sql
+Example:
+SELECT *
+FROM A
+JOIN B  -- 默认inner join
+ON A.user_id = B.id;
+```
+
+USING 适合两边 join key 同名时。写法更短，且会把同名 join key 合并成一列。
+```sql
+Example:
+SELECT *
+FROM A
+JOIN B
+USING (id);
+```
+
+UNNEST and join
+UNNEST 常用于展开数组，属于 correlated join 场景
+```sql
+FROM table, UNNEST(array_col)
+```
+语法上看起来像 comma join，但在 BigQuery 里通常表示 correlated join。
+意思是：对 table 当前这一行里的 array_col 进行展开，如果一行 orders 有 3 个 items，展开后就会变成 3 行。
+不是普通两张独立表的笛卡尔积。
+```sql
+SELECT id, item
+FROM orders, UNNEST(items) AS item;
+```
+
+FROM t, UNNEST(arr)
+= 只保留能展开出的元素行
+
+LEFT JOIN UNNEST(arr) ON ...
+= 保留左表所有行，展开不出来就补 NULL
+这样更安全，不会不小心把原表行丢掉
+
+
+
+Important:
+一对多 join 会放大行数。
+如果 A 一行对应 B 里三行，那么 join 后这行会变成三行。
+这会影响：
+COUNT(*)
+SUM()
+AVG()
+去重逻辑
+
+
+
