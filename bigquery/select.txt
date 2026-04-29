@@ -1,0 +1,119 @@
+STRUCT() 把多个字段组合成一个 STRUCT 值。 它长得像 JSON，但类型是 STRUCT，不是 JSON。
+```sql
+SELECT STRUCT(1 AS a, 2 AS b) AS s;
+SELECT
+cleid,
+ARRAY_AGG(STRUCT(t.*) ORDER BY createtime LIMIT 1)[OFFSET(0)] AS first_row   -- first_row 是一个 STRUCT，里面才包含原表那一整行的字段
+--  等价于 ARRAY_AGG(t ORDER BY createtime LIMIT 1)[OFFSET(0)]，因为 表别名本身可以代表整行， 本质上可以看成一个 STRUCT
+FROM t
+GROUP BY cleid;
+```
+
+SELECT AS STRUCT 把 SELECT 后面的多个列打包成一个 STRUCT 返回。 常用于子查询、ARRAY(...)、保留整行结构。
+```sql
+SELECT AS STRUCT 1 AS a, 2 AS b;
+```
+
+ARRAY(SELECT AS STRUCT ...) 把子查询返回的多行 STRUCT 收集成一个 ARRAY。 常用于 array of struct。
+```sql
+SELECT ARRAY(
+SELECT AS STRUCT 1 AS a, 2 AS b
+) AS a_array;
+```
+
+struct.field 访问 STRUCT 里的字段。(struct_expression.* 把一个 STRUCT 展开成多列。)
+```sql
+SELECT user_info.name
+FROM t;
+```
+
+table_alias.* 展开某个表别名的所有列。 多表查询时很常用。
+
+SELECT * EXCEPT 保留所有列，但排除指定列。 很适合列很多时快速删列。
+```sql
+WITH orders AS (
+SELECT 5 AS order_id, 'sprocket' AS item_name, 200 AS quantity
+)
+SELECT * EXCEPT(quantity)
+FROM orders;
+```
+
+SELECT * REPLACE 保留所有列，但替换指定列的值。 列名和列位置保持不变。
+```sql
+SELECT * REPLACE(
+CASE WHEN quantity > 100 THEN 'high' ELSE 'low' END AS bucket
+)
+FROM orders;
+```
+如果你 replace 的是已有列，比如 c 那 c 还在，只是值变了，你拿来参与计算的列，比如 a, b 不会自动消失
+如果你想让某几列消失，要配合：SELECT * EXCEPT(...) REPLACE(...)
+```sql
+SELECT * EXCEPT(a, b) REPLACE(
+IFNULL(a, 0) + IFNULL(b, 0) AS c  -- 用 a 和 b 算出新的 c, 然后把 a 和 b 删掉
+)
+FROM t;
+```
+
+SELECT AS VALUE 直接返回一个表达式本身作为一行的值， 而不是包装成一个命名列。 常用于返回整行 struct、array element、scalar value。
+SELECT AS VALUE 后面只能有一个表达式，不能像普通 SELECT 一样列多个字段。
+```sql
+SELECT AS VALUE STRUCT(1 AS a, 2 AS b);
+```
+常见场景：每组取一整行时
+```
+SELECT AS VALUE
+ARRAY_AGG(t ORDER BY id LIMIT 1)[OFFSET(0)]
+FROM my_table t
+GROUP BY key;
+```
+
+SELECT DISTINCT 用于去重整行结果。 常见于简单去重场景。
+可以对 STRUCT / ARRAY 做去重比较
+```sql
+SELECT DISTINCT user_id
+FROM t;
+```
+
+SELECT AS STRUCT
+= 把 select list 打包成一个 STRUCT 值
+
+SELECT AS VALUE
+= 直接返回那个表达式本身
+
+什么时候几乎一样？
+当“那个表达式本身就是一个 STRUCT”时，它们结果会很像。
+
+---
+
+SELECT AS VALUE 是 BigQuery 在处理“GROUP BY + ARRAY_AGG(... LIMIT 1)”时的一种简化形式，用来直接返回 struct 本身，而不是再包一层字段名。更完整的例子是：
+```
+CREATE TEMP TABLE basic_per_cle AS (
+  SELECT AS VALUE
+    ARRAY_AGG(basic ORDER BY basic.account_id LIMIT 1)[OFFSET(0)]
+  FROM `...account_basic_info` AS basic
+  WHERE basic.account_status = 'ACTIVE'
+    AND basic.type = 'BUSINESS'
+  GROUP BY basic.client_legal_entity_id
+);
+```
+等价于
+```
+CREATE TEMP TABLE basic_per_cle AS (
+  SELECT
+    ARRAY_AGG(basic ORDER BY basic.account_id LIMIT 1)[OFFSET(0)] AS basic_row
+  FROM `...account_basic_info` AS basic
+  WHERE basic.account_status = 'ACTIVE'
+    AND basic.type = 'BUSINESS'
+  GROUP BY basic.client_legal_entity_id
+);
+```
+区别是：  
+不用给这个 struct 起名 basic_row  
+后面直接当成一行来用（SELECT * FROM basic_per_cle 就是所有列）  
+所以它适合这种模式：  
+  
+有一个表 T，里面一堆列  
+你想按 key group，每组只保留一行（比如“第一个”或“最新的”）  
+保留那一行的所有列  
+而不想手动列出所有列名。  
+在你这份大 SQL 里，凡是“per CLE 压成一行”的场景，都可以考虑这种写法，它既省代码，又让最终结果天然是“一行一个 CLE”，避免最后不得不用 DISTINCT/STRING_AGG(DISTINCT ...) 去救场。  
