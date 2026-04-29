@@ -1,0 +1,103 @@
+数组是什么
+数组是有序的、由零个或多个同类型元素组成的集合。
+BigQuery 支持：
+简单类型数组 - ARRAY<INT64>, ARRAY<STRING> 等
+STRUCT 数组 - ARRAY<STRUCT<...>>
+BigQuery 不支持 array of arrays。
+
+基本规则
+数组里的元素类型必须一致。
+如果需要混合信息，通常用 ARRAY<STRUCT<...>>。
+
+数组字面量
+用 [] 直接写数组。
+```sql
+SELECT [1, 2, 3, 4, 5] AS int_array;
+```
+
+ARRAY of STRUCT
+```sql
+SELECT [
+STRUCT(1 AS idx, 'alice' AS name, TRUE AS active),
+STRUCT(2 AS idx, 'bob' AS name, FALSE AS active)
+] AS employee;
+```
+
+ARRAY(subquery)
+ARRAY(subquery) 用子查询结果构造数组。子查询必须只返回一列。
+```sql
+SELECT ARRAY(
+SELECT 1 UNION ALL
+SELECT 2 UNION ALL
+SELECT 3
+) AS new_array;
+```
+
+如果子查询有多列
+要用 SELECT AS STRUCT，把每一行变成一个 STRUCT。
+```sql
+SELECT ARRAY(
+SELECT AS STRUCT 1 AS id, 'a' AS name
+UNION ALL
+SELECT AS STRUCT 2 AS id, 'b' AS name
+) AS arr;
+```
+
+ARRAY_AGG
+把多行值聚合成一个数组。
+常和 GROUP BY 一起使用，但不一定必须配 GROUP BY。
+```sql
+WITH sales AS (
+SELECT '2024-01-01' AS sale_date, 'Product A' AS product_name, 10 AS quantity_sold UNION ALL
+SELECT '2024-01-01', 'Product B', 15 UNION ALL
+SELECT '2024-01-02', 'Product A', 12 UNION ALL
+SELECT '2024-01-02', 'Product B', 18
+)
+SELECT
+sale_date,
+ARRAY_AGG(STRUCT(product_name, quantity_sold)) AS sales_array
+FROM sales
+GROUP BY sale_date;
+```
+
+ARRAY_CONCAT
+拼接多个数组。
+```sql
+SELECT ARRAY_CONCAT([1, 2], [3, 4], [5, 6]) AS count_to_six;
+```
+
+ARRAY_LENGTH
+返回数组长度。NULL array 返回 NULL。
+```sql
+SELECT
+ARRAY_LENGTH(['coffee', NULL, 'milk']) AS size_a,
+ARRAY_LENGTH(['cake', 'pie']) AS size_b,
+ARRAY_LENGTH(NULL) AS size_c;
+```
+
+ARRAY_REVERSE
+反转数组顺序。
+```sql
+SELECT ARRAY_REVERSE([1, 2, 3]) AS reverse_arr;
+```
+
+ARRAY_TO_STRING
+把数组转成字符串。
+```sql
+SELECT ARRAY_TO_STRING(['coffee', 'tea', 'milk', NULL], ' || ', 'MISSING') AS text;
+```
+
+GENERATE_ARRAY
+生成数值数组。起点和终点都包含。默认步长是 1。
+```sql
+SELECT GENERATE_ARRAY(10, 0, -3) AS example_array;
+```
+
+GENERATE_DATE_ARRAY
+生成日期数组。起点和终点都包含。默认步长是 1 DAY。
+date_part 只能是 DAY, WEEK, MONTH, QUARTER, YEAR。
+```sql
+SELECT GENERATE_DATE_ARRAY('2016-01-01', '2016-12-31', INTERVAL 2 MONTH) AS example;
+```
+
+GENERATE_TIMESTAMP_ARRAY 和 GENERATE_DATE_ARRAY 类似，只是元素类型变成 TIMESTAMP。
