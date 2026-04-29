@@ -1,0 +1,34 @@
+PIVOT / UNPIVOT 是接在 FROM 或 JOIN 结果后面的，
+不是写在 WHERE 后面。
+
+PIVOT 把某一列中的不同取值转成多个列，并对对应的值做聚合。
+常用于把长表变宽表。
+PIVOT 里的聚合函数是必须写的，即使输入已经是聚合后的结果。
+```sql
+SELECT *
+FROM (
+SELECT sale_date, product_name, quantity_sold
+FROM sales
+)
+PIVOT (
+SUM(quantity_sold)
+FOR product_name IN ('Product A' AS product_a, 'Product B' AS product_b, 'Product C' AS product_c)
+)
+ORDER BY sale_date;
+```
+
+UNPIVOT 把多个列转成多行。
+常用于把宽表变长表。
+UNPIVOT 默认会排除 NULL；如果想保留 NULL，要写 INCLUDE NULLS; UNPIVOT INCLUDE NULLS (...)
+```sql
+SELECT sale_date, product_name, quantity_sold
+FROM (
+SELECT sale_date, Product A, Product B, Product C
+FROM sales_pivot
+)
+UNPIVOT (
+quantity_sold
+FOR product_name IN (Product A AS 'product_a', Product B AS 'product_b', Product C AS 'product_c')
+)
+ORDER BY sale_date, product_name;
+```
