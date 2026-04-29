@@ -1,0 +1,46 @@
+Set Operators 可以把两个 query 的结果集合并或比较
+但前提是 两边的 SELECT 必须有相同的列数，并且对应列的数据类型要兼容。
+
+UNION ALL 合并两个结果集，保留所有重复行。
+```sqo
+SELECT * FROM Scores
+UNION ALL
+SELECT * FROM Scores2;
+```
+
+UNION DISTINCT 合并两个结果集，并去重。（有些 SQL 方言里，UNION 通常就表示去重后的 union）
+```sql
+SELECT * FROM Scores
+UNION DISTINCT
+SELECT * FROM Scores2;
+```
+
+INTERSECT DISTINCT 返回两个结果集中都存在的行。
+```sql
+SELECT * FROM Scores
+INTERSECT DISTINCT
+SELECT * FROM Scores2;
+```
+
+EXCEPT DISTINCT 返回只存在于第一个结果集、但不在第二个结果集中的行。
+```sql
+SELECT * FROM Scores
+EXCEPT DISTINCT
+SELECT * FROM Scores2;
+```
+
+https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax#set_operators  
+
+```select * from Scores```  
+```union all``` | ```union distinct``` | ```intersect distinct``` | ```except distinct```  
+```select * from Scores2```
+
+```UNION```: Combines rows from two queries, eliminating duplicates (default).  
+```ALL```: Includes all duplicates (UNION ALL).  
+```DISTINCT```: Removes duplicates (default behavior).  
+
+```INTERSECT```: Returns common rows from both queries.  
+```DISTINCT```: Implied; returns distinct common rows.  
+
+```EXCEPT```: Returns rows from the first query that are not in the second query.  
+```DISTINCT```: Implied; returns unique rows that are only in the first query.
