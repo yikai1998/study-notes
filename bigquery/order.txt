@@ -1,0 +1,40 @@
+默认升序 不写 ASC / DESC 时，默认是 ASC
+
+可以显式指定 NULL 排在前面还是后面
+```sql
+ORDER BY x DESC NULLS FIRST
+```
+
+ORDER BY 2 表示按第 2 列排序。但一般直接写列名更清楚
+
+可以按计算结果排序
+```sql
+ORDER BY price * quantity DESC
+```
+
+可以自定义排序规则 用 CASE WHEN 让排序不是简单的 ASC / DESC
+```sql
+ORDER BY
+CASE
+WHEN status = 'urgent' THEN 1
+WHEN status = 'normal' THEN 2
+WHEN status = 'low' THEN 3
+ELSE 4
+END
+```
+
+和 LIMIT / OFFSET 一起很常见 如果不写 ORDER BY， LIMIT / OFFSET 的结果通常不稳定、不可预测
+
+和 UNION / UNION ALL 等 set operators 一起用时 ORDER BY 作用于整个结果集， 不是只作用于最后一个 SELECT
+```sql
+SELECT * FROM A
+UNION ALL
+SELECT * FROM B
+ORDER BY id;
+
+-- 等价于：
+(SELECT * FROM A
+UNION ALL
+SELECT * FROM B)
+ORDER BY id
+```
