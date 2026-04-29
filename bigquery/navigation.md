@@ -98,7 +98,7 @@ FROM (
 ```
 
 ```LAG```  
-Returns the value of the value_expression on a **preceding** row.  
+Returns the value of the value_expression on a **preceding** row. 看上面  
 Changing the offset value changes which preceding row is returned; the default value is 1, indicating the previous row in the window frame.  
 https://cloud.google.com/bigquery/docs/reference/standard-sql/navigation_functions#lag  
 ```
@@ -139,7 +139,7 @@ FROM finishers;
 ```
 
 ```LEAD```  
-Returns the value of the value_expression on a subsequent row.  
+Returns the value of the value_expression on a subsequent row. 看下面  
 Changing the offset value changes which subsequent row is returned; the default value is 1, indicating the next row in the window frame.  
 https://cloud.google.com/bigquery/docs/reference/standard-sql/navigation_functions#lead  
 ```
