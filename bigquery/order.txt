@@ -2,7 +2,7 @@
 
 可以显式指定 NULL 排在前面还是后面
 ```sql
-ORDER BY x DESC NULLS FIRST
+ORDER BY x DESC NULLS FIRST/LAST
 ```
 
 ORDER BY 2 表示按第 2 列排序。但一般直接写列名更清楚
