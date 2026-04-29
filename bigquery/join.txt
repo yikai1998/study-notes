@@ -1,4 +1,4 @@
-INNER JOIN 只返回两边能匹配上的行。（JOIN 单独写时，默认是 INNER JOIN，）
+INNER JOIN 只返回两边能匹配上的行。（JOIN 单独写时，默认是 INNER JOIN）
 ```sql
 SELECT *
 FROM A
