@@ -1,10 +1,24 @@
-https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax#group_by_all  
-The ```GROUP BY ALL``` clause groups rows by inferring grouping keys from the SELECT items.  
+GROUP BY 用来把多行按某些列分成若干组，然后对每组做聚合计算。
+SELECT 里出现的列，如果不是聚合结果，就必须出现在 GROUP BY 中。
+因为聚合后，一组只剩一行；那些非聚合列必须能唯一代表这组。
 
----
-https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax#group_by_grouping_sets  
+WHERE 和 HAVING
+WHERE 是分组前过滤行。
+HAVING 是分组后过滤组。
+
+NULL
+GROUP BY 时，NULL 会被当作同一组处理。
+也就是说多个 NULL 会归到同一个分组里。
+
+GROUP BY ALL
+GROUP BY ALL 会根据 SELECT 里的非聚合项自动推断分组键。
+适合少量场景下省略重复书写，但可读性和可控性通常不如显式写列名。
+
+GROUPING SETS
+GROUP BY GROUPING SETS 用来一次产生多种分组结果。
+可以理解为对不同的 group by 结果做 UNION ALL，但由数据库一次完成。
 GROUP BY GROUPING SETS(x,y) is roughly equivalent to GROUP BY x UNION ALL GROUP BY y  
-```
+```sql
 -- GROUP BY with GROUPING SETS
 WITH
   Products AS (
