@@ -1,0 +1,61 @@
+CTE = common table expression
+作用是在一条 query 里定义临时命名结果，方便后面引用。
+
+最常用：non-recursive CTE
+主要用于拆复杂 SQL，提高可读性。
+```sql
+WITH base AS (
+  SELECT user_id, order_id, amount
+  FROM orders
+  WHERE order_date >= DATE '2024-01-01'
+),
+user_orders AS (
+  SELECT user_id, COUNT(*) AS order_cnt, SUM(amount) AS total_amount
+  FROM base
+  GROUP BY user_id
+)
+SELECT *
+FROM user_orders
+WHERE total_amount > 1000
+```
+
+注意
+CTE 不等于临时表。
+在 BigQuery 里，普通 non-recursive CTE 主要是为了可读性，不保证被物化复用。
+如果同一个 non-recursive CTE 被引用多次，BigQuery 可能每次都重新执行。
+如果真的想复用中间结果，可以考虑 TEMP TABLE。
+
+WITH RECURSIVE (低频)
+用于递归查询，比如组织架构、树结构、图遍历、上下级关系。有 500 次迭代限制。
+```sql
+WITH RECURSIVE cte_name AS (
+  base_query
+
+  UNION ALL
+
+  recursive_query
+)
+SELECT *
+FROM cte_name
+```
+```sql
+WITH RECURSIVE r AS (
+  SELECT id, name, id AS top_leader_id
+  FROM emp
+  WHERE leader_id IS NULL
+
+  UNION ALL
+
+  SELECT e.id, e.name, r.top_leader_id
+  FROM emp e
+  JOIN r ON e.leader_id = r.id
+)
+SELECT id, name, top_leader_id
+FROM r
+ORDER BY id;
+-- 这个例子含义
+-- 先找所有顶层 leader。
+-- 然后一层一层找他们的下属。
+-- top_leader_id 会一路从顶层传下来。
+-- 最终每个人都能知道自己属于哪棵树 / 哪个顶层 leader。
+```
