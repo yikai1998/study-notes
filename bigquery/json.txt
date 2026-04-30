@@ -1,0 +1,31 @@
+PARSE_JSON 把 JSON-formatted STRING 转成 JSON type。
+```sql
+SELECT PARSE_JSON('{"a": 1, "b": ["x", "y"]}') AS j
+```
+
+TO_JSON_STRING 把 SQL 值转成 JSON-formatted STRING。
+```sql
+SELECT TO_JSON_STRING(STRUCT(1 AS id, 'alice' AS name)) AS json_str
+```
+
+JSON_VALUE 从 JSON 中取 scalar value，返回 SQL STRING。
+适合取 string、number、boolean 这类标量。
+JSON_VALUE 返回的是 SQL STRING，不是 JSON。如果要当数字用，通常再 CAST。
+会去掉最外层引号。
+```sql
+SELECT JSON_VALUE('{"a": [123, 689], "b": "hello"}', '$.a[1]') AS v1,
+JSON_VALUE('{"a": [123, 689], "b": "hello"}', '$.b') AS v2
+```
+
+JSON_QUERY 从 JSON 中取 object 或 array，保留 JSON 结构。
+适合取数组或对象。(如果后面要展开或逐个处理数组元素，用 JSON_QUERY_ARRAY)
+```sql
+SELECT JSON_QUERY('{"a": [123, 689], "b": [["hello", "hello2"], "world"]}', '$.b[0]') AS j;
+
+WITH t AS (
+  SELECT JSON '{"items": [{"id": 1}, {"id": 2}]}' AS payload
+)
+SELECT JSON_VALUE(item, '$.id') AS item_id
+FROM t, UNNEST(JSON_QUERY_ARRAY(payload, '$.items')) AS item;
+```
+
