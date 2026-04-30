@@ -5,7 +5,7 @@ git config --global user.name "diy名字"
 git config --global user.email "当时注册 GitHub 的邮箱"
 
 3. 让电脑免密码进门 只做一次
-ssh-keygen -t ed25519 -C "同上邮箱"   # 然后一路回车
+ssh-keygen -t ed25519 -C "同上邮箱"   # 然后一路回车 (ED25519是一种非对称签名算法)
 把 \.ssh\id_ed25519.pub 打开 → 全复制 → GitHub 头像 → Settings → SSH and GPG keys → New SSH key → 贴进去 → Add
     你电脑里存着“私钥”（不能泄露），GitHub 存着“公钥”（可公开）
     你电脑保存私钥，GitHub 保存公钥。连接时，GitHub 通过你上传的公钥，验证你电脑里对应私钥生成的签名；验证通过，就确认是你本人。SSH 连接本身也会加密传输。
