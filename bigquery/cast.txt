@@ -1,0 +1,21 @@
+CAST
+CAST(expr AS type) 用来把表达式转换成另一种类型。
+如果 BigQuery 不能完成转换，CAST 会报错。
+SAFE_CAST(expr AS type) 在转换失败时返回 NULL，不报错。
+
+FORMAT
+有些 CAST 支持 FORMAT 子句，不是所有。
+FORMAT 的作用是告诉 BigQuery 如何解析输入值，描述的是 source string 的格式，不是结果的输出格式。
+
+CAST to TIMESTAMP
+把字符串 CAST 成 TIMESTAMP 时，如果字符串不是默认可识别格式，可以用 FORMAT 指定解析模板。
+如果字符串本身不带时区信息，可以用 AT TIME ZONE 指定应按哪个时区理解这个输入时间。
+转成 TIMESTAMP 后，表示的是一个绝对时间点，结果通常以 UTC 显示。
+
+```sql
+CAST('06/02/2020 17:00:53.110' AS TIMESTAMP FORMAT 'MM/DD/YYYY HH24:MI:SS.FF3' AT TIME ZONE 'UTC+8')
+
+-- FORMAT 'MM/DD/YYYY HH24:MI:SS.FF3' 的意思是按这个模板解析输入字符串。
+-- AT TIME ZONE 'UTC+8' 的意思是把 2020-06-02 17:00:53.110 当作 UTC+8 时区下的本地时间。
+-- 转换成 TIMESTAMP 后会换算成 UTC，所以结果是 2020-06-02 09:00:53.110000 UTC。
+```
