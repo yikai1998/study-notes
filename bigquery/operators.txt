@@ -1,0 +1,62 @@
+Array subscript operator 用于从 ARRAY 中按位置取元素。
+
+OFFSET(index) 从 0 开始。越界会报错。
+SAFE_OFFSET(index) 从 0 开始。越界返回 NULL。
+ORDINAL(index) 从 1 开始。越界会报错。
+SAFE_ORDINAL(index) 从 1 开始。越界返回 NULL。
+
+JSON subscript operator 用于从 JSON type 中取字段或数组元素。
+返回类型是 JSON。
+如果字段不存在或数组越界，返回 SQL NULL。
+```sql
+SELECT JSON '{"a": {"b": [10, 20]}}'.a.b[0] AS v
+```
+注意
+JSON subscript operator 主要用于 JSON type。
+如果字段是 JSON-formatted STRING，通常先 PARSE_JSON，或者用 JSON_VALUE / JSON_QUERY。
+
+Date arithmetic
+DATE 可以直接加减整数，单位是 day。
+```sql
+SELECT
+  DATE "2020-09-22" + 1 AS day_later,  -- 等价 DATE_ADD(date_col, INTERVAL 1 DAY)
+  DATE "2020-09-22" - 7 AS week_ago  -- 等价 DATE_SUB(date_col, INTERVAL 7 DAY)
+```
+
+Datetime subtraction
+```sql
+SELECT DATE "2021-05-20" - DATE "2020-04-19" AS date_diff;
+SELECT
+DATE "2021-04-20" + INTERVAL 25 HOUR AS date_plus,
+TIMESTAMP "2021-05-02 00:01:02.345" - INTERVAL 10 SECOND AS time_minus;
+```
+
+BETWEEN
+X BETWEEN Y AND Z
+等价于
+Y <= X AND X <= Z
+
+EXISTS 判断子查询是否返回至少一行。只要子查询有一行，EXISTS 就是 TRUE。
+```sql
+WHERE EXISTS (
+  SELECT 1
+  FROM orders o
+  WHERE o.user_id = u.user_id
+)
+```
+
+IN 判断某个值是否在集合里。也可以配合子查询。也可以配合 UNNEST
+```sql
+WHERE status IN UNNEST(['paid', 'settled'])
+```
+注意
+如果用 NOT IN 子查询，最好确保子查询列没有 NULL。更稳的反连接写法是 NOT EXISTS。
+
+LIKE 用于字符串模式匹配。
+% 匹配任意长度字符。
+_ 匹配单个字符。
+```sql
+WHERE code LIKE '_1%'  -- 含义 第二个字符是 1。
+```
+An underscore ```_``` matches a single character or byte.
+You can escape ```\``` ```_``` ```%``` using two backslashes. For example, ```\\%```. If you are using raw strings, only a single backslash is required. For example, ```r'\%'```
