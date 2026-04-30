@@ -46,6 +46,13 @@ COUNT(DISTINCT ...) 会默认忽略null
 COUNT(DISTINCT IF(x > 0, x, NULL))
 ```
 
+注意：
+count(*) 数行，不管列值是不是 NULL (* 在这里不是普通 SELECT 里的“取所有列”，而是 COUNT 语义的一部分)
+count(col) 数非 NULL
+SUM(1) 是把每行的 1 相加，很多时候结果看起来像行数。但它和 COUNT(*) 不完全等价。最大区别是空输入时：COUNT(*) 返回 0，SUM(1) 返回 NULL。
+所以日常统计总行数推荐用 count(*)，不推荐用 SUM(1)
+COUNT(1) 通常和 COUNT(*) 结果相同，但在 BigQuery 里一般不要认为它更快。
+
 COUNTIF(condition) 统计满足条件的行数
 
 LOGICAL_AND / LOGICAL_OR 对分组内的布尔值进行逻辑与/或运算。
