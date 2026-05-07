@@ -1,6 +1,6 @@
-参考链接：https://spark.apache.org/docs/latest/sql-ref-functions-builtin.html  
+https://spark.apache.org/docs/latest/sql-ref-functions-builtin.html  
 
-# 主要是一些基本常见的函数整理  
+一些基本常见的函数整理  
 
 ---
 ## aggregate related
