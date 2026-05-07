@@ -1,3 +1,116 @@
+Spark / Databricks SQL 嵌套数据速查
+
+STRUCT：col.field
+MAP：col['key'] 或 element_at(col, 'key')
+ARRAY：col[0] 或 element_at(col, 1)
+JSON 字符串：col:path 或 get_json_object(col, '$.path')
+VARIANT：col:path::TYPE 或 col:path?::TYPE
+
+STRUCT
+就是“结构体/对象/一行数据”，像{"a":1,"b":"x"} 或 Python 里的 dict 或“数据库表里的单行”，包含一组有名字的字段
+SQL类型: STRUCT<a INT, b STRING>
+```sql
+data.accountManager
+data.user.name
+```
+
+MAP
+就是“字典”，一堆key-value键值对，比如{"a":10, "b":20}
+和struct区别：map的key一般可以是任意值（字符串、数字，不需要提前写死），struct的key字段是表结构里提前定义好的
+SQL类型: MAP<STRING, INT>
+m['say']
+element_at(m, 'say')
+
+ARRAY
+
+arr[0] 是第一个
+arr[1] 是第二个
+element_at(arr, 1) 是第一个
+element_at(arr, -1) 是最后一个
+
+JSON 字符串
+
+raw:accountManager
+get_json_object(raw, '$.accountManager')
+get_json_object(raw, '$.user.name')
+get_json_object(raw, '$.items[0].price')
+
+STRUCT 不要绕 JSON：
+
+推荐：data.accountManager
+不推荐：get_json_object(to_json(data), '$.accountManager')
+
+VARIANT
+
+v:accountManager
+v:user.name
+v:items.price
+v:price::DOUBLE
+v:price?::DOUBLE
+
+类型转换
+
+expr::TYPE 等价于 CAST(expr AS TYPE)
+expr?::TYPE 等价于 TRY_CAST(expr AS TYPE)
+
+例子：
+
+'20'::INT 返回 20
+'abc'?::INT 返回 NULL
+
+from_json
+
+JSON 字符串转强类型：
+
+from_json(raw, 'STRUCT<accountManager: STRING, age: INT>')
+
+然后取字段：
+
+data.accountManager
+data.age
+
+to_json
+
+强类型转 JSON 字符串：
+
+to_json(data)
+
+常见坑
+
+get_json_object 输入是 JSON 字符串，返回 STRING。
+
+data 是 STRUCT：
+
+用 data.accountManager
+不用 get_json_object(data, '$.accountManager')
+
+ARRAY 下标：
+
+arr[0] 是第一个
+element_at(arr, 1) 是第一个
+
+ARRAY<BOOLEAN> 不能 .final。
+
+错：
+
+element_at(from_json(json, 'ARRAY<BOOLEAN>'), -1).final
+
+对：
+
+element_at(from_json(json, 'ARRAY<STRUCT<final: BOOLEAN>>'), -1).final
+
+最终记忆：
+
+STRUCT 用 .
+MAP 用 ['key']
+ARRAY 用 [0] 或 element_at
+JSON 字符串用 : 或 get_json_object
+VARIANT 用 :
+转类型用 ::
+安全转类型用 ?::
+
+
+
 参考链接：https://docs.databricks.com/aws/en/sql/language-manual/data-types  
 
 ```txt
