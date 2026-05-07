@@ -1,8 +1,6 @@
-https://spark.apache.org/docs/latest/sql-ref-functions-builtin.html  
-
 一些基本常见的函数整理  
+参考链接：https://spark.apache.org/docs/latest/sql-ref-functions-builtin.html  
 
----
 ## aggregate related
 - array_agg  // Collects and returns a list of non-unique elements. ignore nulls by default, can not be set.
 - collect_list  // Collects and returns a list of non-unique elements.
@@ -15,12 +13,10 @@ emo,
 listagg(distinct grade, '*'),
 string_agg(distinct grade, '*')
 from values ('a', 'happy'), ('b', 'sad'), ('c', 'happy') as tab(grade, emo) 
-group by all;
+group by 1;
 
 SELECT string_agg(col) WITHIN GROUP (ORDER BY col DESC) FROM VALUES ('a'), ('b'), ('c') AS tab(col);
 ```
-
---- 
 
 ## array related
 - array_append(array, element)  // Add the element at the end of the array. Type of element should be similar to type of the elements of the array.
@@ -49,13 +45,7 @@ SELECT array_repeat('123', 2);
 SELECT arrays_zip(array(1, 2, 3), array(2, 3, 4));  -- [{1, 2}, {2, 3}, {3, 4}]
 SELECT arrays_zip(array(1, 2), array(2, 3), array(3, 4));  -- [{1, 2, 3}, {2, 3, 4}]
 ```
-<img width="650" alt="image" src="https://github.com/user-attachments/assets/1bb4018a-2fe1-4be0-b769-9f4a4478f2d1" />
-<img width="852" alt="image" src="https://github.com/user-attachments/assets/e47c7d18-c7b9-4209-a60b-0a780eb22e3e" />
-
 - flatten  // Transforms an array of arrays into a single array.
-```sql
-SELECT flatten(array(array(1, 2), array(3, 4)));  -- [1, 2, 3, 4]
-```
 - get(array, index)	 // Returns element of array at given (0-based) index. If the index points outside of the array boundaries, then this function returns NULL.
 - sequence(start, stop, step)
 - slice(x, start, length)	 // Subsets array x starting from index start (array indices start at 1, or starting from the end if start is negative) with the specified length.
