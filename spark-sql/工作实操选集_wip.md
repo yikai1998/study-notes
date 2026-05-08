@@ -1,12 +1,5 @@
 
 ```sql
-对于那种object怎么拿数据
-get_json_object(extra_info::string, "$.oktaUser['urn:ietf:params:scim:schemas:extension:enterprise:2.0:User'].employeeNumber") as emp_number,
-extra_info:oktaUser['urn:ietf:params:scim:schemas:extension:enterprise:2.0:User']:manager:displayName::string as emp_manager_name,
-
-```
-
-```sql
 -- channel partner cases of which the ppta is only ppta
 /*
 create temp view id_pool as (
