@@ -1,10 +1,10 @@
-```txt
 你在 Notebook 里用 Python 注册的 udf（spark.udf.register），只能在同一个 Notebook/Session 里用，不能拿到 SQL Warehouse 或别的 Notebook 里用；
 你在 Databricks SQL Warehouse/SQL 编辑器里，只能用 SQL 级别创建的 Permanent UDF（不支持 Python 写）。
-```
 
-## 简单案例  
+
+## 几个简单案例  
 ```py
+%python
 # 最简单的加法功能
 from pyspark.sql.functions import udf  # 导入 UDF 工具，它可以将 Python 普通函数转为 Spark 可用的 UDF（用户自定义函数）。
 from pyspark.sql.types import IntegerType  # 引入类型定义（这里是整数类型），后面注册 UDF 时要指定返回值的类型。
@@ -14,19 +14,9 @@ def my_add(x, y):
 
 spark.udf.register("my_add", my_add, IntegerType())  # 注册到 SQL 环境；将“my_add”注册为 Spark 的 SQL UDF，可以在 SQL 里直接当函数用，结果类型为整型。
 ```
-
-```py
-# 去除特殊字符
-from pyspark.sql.types import StringType
-import re
-
-def clean_string(s):
-    if s is None:
-        return None
-    # 只保留字母和数字
-    return re.sub(r'[^a-zA-Z0-9]', '', s)
-
-spark.udf.register("clean_string", clean_string, StringType())
+```
+%sql
+select my_add(11, 12342)
 ```
 
 ```py
