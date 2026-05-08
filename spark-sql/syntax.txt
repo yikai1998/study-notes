@@ -1,0 +1,35 @@
+建持久表（CREATE TABLE）——支持，并写到 catalog/warehouse 里。
+建临时视图（CREATE TEMP VIEW）——完全支持，强烈推荐。
+CREATE TEMP TABLE —— 语法不推荐／少数 Spark 版本才勉强兼容；优先用 VIEW 替代。
+
+```sql
+CREATE OR REPLACE TEMP VIEW t1 AS
+SELECT explode(array(struct(10, 20), struct(null, 55))) AS col;
+```
+
+as后的query，不用加分号，也不要最外层括号
+
+CREATE VIEW/CREATE TABLE/CREATE TEMP VIEW 只做定义，没展示结果。
+只有 SELECT（或 SHOW TABLES）等查询动作，才会返回内容！
+
+create view 和 create table虽然看起来都能生成表，但是有区别：
+表（table）是真实持久存储数据的“实体”，数据物理存在，只有你drop table才消失，其他对象（如视图或其它sql）通常依赖它都不会失效（除非你真把表删了）。
+视图（view）是虚拟的“查询结果”，本身不真正存数据，而是保存了一段SQL逻辑。
+如果你有一串链式的view，比如：
+%sql
+CREATE VIEW v1 AS SELECT ... FROM t_base;
+CREATE VIEW v2 AS SELECT ... FROM v1;
+CREATE VIEW v3 AS SELECT ... FROM v2;
+这时如果删除了v1（执行DROP VIEW v1），
+v2、v3都会立刻失效/报错（因为v2定义里用到了v1，v3里用到了v2）。只要中间的基础view被删，依赖它的view全部不能用了。
+实际效果是：
+你再查 SELECT * FROM v2 或 v3，都会报“找不到依赖对象v1/v2”等类似错误。
+这种依赖链在所有主流数据库/引擎/大数据平台中都是如此的！
+
+查看表结构
+spark.sql("DESCRIBE TABLE my_table").show()
+
+变量
+DECLARE VARIABLE row_limit INT DEFAULT 10;
+SET VAR row_limit = 20;
+DROP TEMPORARY VARIABLE row_limit;
