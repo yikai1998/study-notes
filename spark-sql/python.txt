@@ -8,8 +8,9 @@ xxx@xxx.com
 """
 ids = [line.strip() for line in raw.strip().splitlines()]
 df = spark.createDataFrame([(i, 'temp') for i in ids], "user STRING, tag STRING")
+# 想彻底重建表结构（字段完全保持与 DataFrame 一致）：先Drop `spark.sql("DROP TABLE IF EXISTS `data-prod-sg`.yikai_test_dbt.tmp_ids")`，再SaveAsTable
 df.write.mode("overwrite").option("mergeSchema", "true").saveAsTable("`data-nonprod-sg`.yikai_dwa_dbt.temp_output")  -- 直接落到永久表或永久视图
-# df.createOrReplaceGlobalTempView("tmp_ids_0902")
+# df.createOrReplaceGlobalTempView("tmp_ids") 也可以，但不如落到表简单 (serverless 环境下不能用 createOrReplaceGlobalTempView，只能用本地createOrReplaceTempView 或持久表。)
 ```
 
 extract data from databricks table - 方法1
