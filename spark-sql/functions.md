@@ -1,6 +1,7 @@
 一些基本常见的函数整理  
 参考链接：https://spark.apache.org/docs/latest/sql-ref-functions-builtin.html  
 
+
 ## aggregate related
 - array_agg  // Collects and returns a list of non-unique elements. ignore nulls by default, can not be set.
 - collect_list  // Collects and returns a list of non-unique elements.
@@ -17,6 +18,7 @@ group by 1;
 
 SELECT string_agg(col) WITHIN GROUP (ORDER BY col DESC) FROM VALUES ('a'), ('b'), ('c') AS tab(col);
 ```
+
 
 ## array related
 - array_append(array, element)  // Add the element at the end of the array. Type of element should be similar to type of the elements of the array.
@@ -51,7 +53,6 @@ SELECT arrays_zip(array(1, 2), array(2, 3), array(3, 4));  -- [{1, 2, 3}, {2, 3,
 - slice(x, start, length)	 // Subsets array x starting from index start (array indices start at 1, or starting from the end if start is negative) with the specified length.
 - sort_array(array[, ascendingOrder])	 // Null elements will be placed at the beginning of the returned array in ascending order or at the end of the returned array in descending order.
 
----
 
 ## map related  
 - (try_)element_at(array, index)  // Returns element of array at given (1-based) index.
@@ -60,38 +61,13 @@ SELECT arrays_zip(array(1, 2), array(2, 3), array(3, 4));  -- [{1, 2, 3}, {2, 3,
 - map_concat(map, ...)
 - map_contains_key(map, key)
 - map_entries(map)	// Returns an unordered array of all entries in the given map.
-```sql
-“entry”在英语里常作为“入口”用词，但在数据结构或数据库语境下，entry 指的是“一个键值对项”（key-value pair）。
-map_entries(map) 就是把“字典”里的每一组（key,value）“拆包”成数组，或者说“变成一张两列的表”。
-在SQL（如 Presto、Trino、SparkSQL、ClickHouse 等）里的 map 结构，本质就是一个“键→值”的两列关系，即“key→value”
-每个key只能对应一个value
-... 你每个map entry依然只有两列（key和value），但value本身可以是Record、对象或结构体，可以有多个字段。
-SELECT map_entries(map(1, 'a', 2, 'b'));  -- [{1, a}, {2, b}]
-```
-- map_from_arrays()
-```sql
-SELECT map_from_arrays(array(1.0, 3.0), array('2', '4'));
--- {1.0 -> 2, 3.0 -> 4}
-```
-- map_from_entries
-```sql
-SELECT map_from_entries(array(struct(1, 'a'), struct(2, 'b')));  -- {1 -> a, 2 -> b}
-看到 map: 就是字典{key→value}
-看到 entries: 就是一堆(key,value)一组的东西
-看到 map_from_entries: 就是把这些组装成字典
-看到 map_entries: 就是把字典拆成一堆(key,value)的行
-```
-- map_keys, map_values  // Returns an unordered array containing the keys/values of the map
-- str_to_map(text[, pairDelim[, keyValueDelim]])
-```sql
-SELECT str_to_map('a:1,b:2,c:3', ',', ':');
-```
 
----
 
 ## date timestamp related
 ```sql
-select current_timestamp(), timestamp('2023-01-31T04:07:37.993+00:00') - interval 2 days
+select
+current_timestamp(),
+timestamp('2023-01-31T04:07:37.993+00:00') - interval 2 days
 // 你如果写的是 '2023-01-31T04:07:37.993+08:00' 那么会自动帮你转成+00的时间 如果你没写或写的直接是+00 那么时间就不会变 仍然是+00
 ```
 - add_months  // 加的是month，可以减
@@ -107,8 +83,13 @@ select convert_timezone('UTC', 'Asia/Shanghai', now())  -- current local time as
 - current_date()
 - current_timestamp()
 - date_diff(end, start)
-```
-select from_utc_timestamp(from_unixtime(1738146297797/1000), 'UTC+8'), to_date(from_unixtime(1738146297797/1000)), current_timestamp(), date_diff(MONTH, timestamp(from_unixtime(1738146297797/1000)), current_timestamp())
+```sql
+select
+from_utc_timestamp(from_unixtime(1738146297797/1000), 'UTC+8'),
+to_date(from_unixtime(1738146297797/1000)),
+current_timestamp(),
+date_diff(MONTH, timestamp(from_unixtime(1738146297797/1000)), current_timestamp())
+select from_unixtime(1752529852653/1000, 'yyyy-MM-dd')  -- 2025-07-14
 ```
 - date_format  // 把timestamp转换成string
 ```sql
@@ -117,13 +98,11 @@ SELECT date_format(current_date(), 'yyyy-MM-dd');  -- 2025-05-20
 SELECT date_format(now(), 'yyyy-MM-dd HH:mm:ss');  -- 2025-05-20 02:58:14
 ```
 - date_from_unix_date  // Create date from the number of days since 1970-01-01.
-```
+```sql
 date_from_unix_date(x) 里的参数 x 必须是从 1970-01-01 开始的“天数”（整数天），而不是你常见的秒或毫秒级Unix时间戳。
 1738146297797 是一个毫秒级时间戳（通常是13位数，远大于一天数int能存的范围），会溢出。
 如果是毫秒级时间戳，先除以1000得到秒
 如果是秒级时间戳 from_unixtime(CAST(kc.created_at AS BIGINT))
-date_from_unix_date 的参数范围超了int最大，强制类型转的时候报溢出错。
-select from_unixtime(1738146297797/1000)  -- 2025-01-29 10:24:57
 ```
 - date_part(field, source)  // Extracts a part of the date/timestamp or interval source.
 ```sql
@@ -134,7 +113,6 @@ select date_part('week', now());  -- 21
 select date_part('doy', timestamp('2025-02-10'));  -- 41 (days of the year) [没有所谓的dom，这种效果你直接看day就行了]
 select date_part('dow', timestamp('2025-05-25'));  -- 1 (day of the week, 1 is Sunday, 2 is Monday)
 select date_part('days', interval 5 days 3 hours 7 minutes 30 seconds 1 milliseconds 1 microseconds);  -- 5
-select date_part('minutes', interval 5 days 3 hours 7 minutes 30 seconds 1 milliseconds 1 microseconds);  -- 7
 ```
 - date_trunc(fmt, ts)  // Returns timestamp that is truncated to the unit specified by the format model
 ```sql
@@ -149,24 +127,11 @@ select make_date(2025, 11, 8)  -- 2025-11-08
 ```sql
 SELECT last_day('2009-01-12');  -- 2009-01-31
 ```
-- window(time_column, window_duration[, slide_duration[, start_time]])  // 如果你没做实时流式大数据，没做事件流分析/传感器/行为数据监控，确实日常做业务SQL很难用到
-```sql
-SELECT
-  window(event_time, '5 minutes') as win,
-  sum(amount)
-FROM events
-GROUP BY window(event_time, '5 minutes')
-# 如果你要每5分钟统计一次总金额，window会自动帮你把这些 row 按照 12:00-12:05, 12:05-12:10, 12:10-12:15... 分组。
-```
 - unix_date  // Returns the number of days since 1970-01-01.
 - unix_millis
 - unix_micros
 - from_unixtime
-```sql
-SELECT from_unixtime(0);  -- 1970-01-01 00:00:00
-select from_unixtime(1752529852653/1000, 'yyyy-MM-dd')  -- 2025-07-14
-SELECT unix_date(DATE("1970-01-02"));  -- 1
----
+
 
 ## json related  
 - from_json(jsonStr, schema[, options])	 // `SELECT from_json('{"a":1, "b":0.8}', 'a INT, b DOUBLE')['a'];`
@@ -176,18 +141,9 @@ SELECT unix_date(DATE("1970-01-02"));  -- 1
 SELECT get_json_object('{"a":"b"}', '$.a');  -- b
 SELECT get_json_object('{"user":{"name":"张三", "age":18}, "status":"ok"}', '$.user.name');  -- 张三
 SELECT get_json_object('{"tags":["a","b","c"], "count": 3}', '$.tags[1]');  -- b
-```
-```sql
 -- 特殊 如果key是带引号的话
-SELECT
-  get_json_object(extra_info::string,
-    "$.oktaUser['urn:ietf:params:scim:schemas:extension:enterprise:2.0:User']") AS enterprise_raw,
-  get_json_object(extra_info::string,
-    '$.oktaUser.schemas[1]') AS idname,
-    extra_info,
-    *
-FROM `tp-prod-sg`.silver.airboardngauth__account
-where id = '330'
+get_json_object(extra_info::string, "$.oktaUser['urn:ietf:params:scim:schemas:extension:enterprise:2.0:User']") AS enterprise_raw,
+get_json_object(extra_info::string, '$.oktaUser.schemas[1]') AS idname,
 ```
 - json_array_length(jsonArray) 
 - json_object_keys(json_object)
