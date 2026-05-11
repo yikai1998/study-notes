@@ -34,22 +34,24 @@ function onEdit(e) {
 } 
 
 /*
-onEdit(e) 是一个“简单触发器”
+onEdit(e) 是 Google Sheets 的简单触发器。
 
-Google Sheets 内置两种触发器：
-  简单触发器（Simple Trigger）
-  名字必须是 onEdit
-  不能改名
-  不能手动运行
-  不能传参
-  只有用户编辑表格时才会自动触发
+如果作为 simple trigger 使用，函数名必须叫 onEdit。
 
-Google Sheets 会自动传入一个事件对象 e，里面包含：
-  e.range → 被编辑的单元格
-  e.value → 新值
-  e.oldValue → 旧值
-  e.source → 当前 Spreadsheet
-  e.user → 编辑者
+它不需要手动创建触发器。
 
-你不需要传参，Google 会自动传。
+当用户手动编辑表格单元格时，Google Sheets 会自动运行它。
+
+Google 会自动传入事件对象 e。
+
+常用字段包括：
+e.range：被编辑的 range
+e.value：新值，通常只适用于单个单元格编辑
+e.oldValue：旧值，如果有的话
+e.source：当前 Spreadsheet
+e.user：编辑者，但不保证一定有
+
+平时不需要自己传参。
+
+但不能直接依赖手动 Run 测试，因为手动运行时没有真实 e 对象。
 */
