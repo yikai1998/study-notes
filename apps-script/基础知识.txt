@@ -48,6 +48,22 @@ const result = sum(...args); // 6
 
 
 
+let e of block.blocks[0].elements 的意思是：
+逐个遍历 block.blocks[0].elements 这个数组里的每一个元素，每次当前元素叫 e
+```js
+for (let e of block.blocks[0].elements) {
+  // e 就是当前这个 element
+}
+```
+等价于
+```js
+for (let i = 0; i < block.blocks[0].elements.length; i++) {
+  let e = block.blocks[0].elements[i];
+}
+```
+
+
+
 filter 筛选数组
 ```js
 const result = numbers.filter(function(x) {
