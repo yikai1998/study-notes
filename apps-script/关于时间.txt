@@ -1,0 +1,75 @@
+当前时间的文本格式（自动识别当地/自定义时区）
+var now = new Date(); 
+var timeZone = Session.getScriptTimeZone(); // Get the script's timezone
+var formattedDate = Utilities.formatDate(now, timeZone, 'yyyy-MM-dd'); 
+var formattedDateTime = Utilities.formatDate(now, 'GMT+08:00', 'yyyy-MM-dd HH:mm:ss'); 
+
+常用格式参数：
+yyyy: Four-digit year. 
+yy: Two-digit year. 
+MMM: Abbreviated month name. 
+MMMM: Full month name. 
+MM: Two-digit month (01-12). 
+dd: Two-digit day of the month (01-31). 
+HH: Two-digit hour in 24-hour format (00-23). 
+hh: Two-digit hour in 12-hour format (01-12). 
+mm: Two-digit minutes (00-59). 
+ss: Two-digit seconds (00-59). 
+a: AM/PM marker. // 'hh:mm:ss a' formats the current time like 02:30:00 PM
+u: Represents the day number of the week with Monday as day 1 through to Sunday as day 7. 
+
+
+创建时间对象
+var now = new Date(); // Current date and time 
+var specificDate = new Date(2023, 8, 5); // Note: Months are 0-based (January = 0, December = 11) //September 5, 2023 
+var specificDateTime = new Date(2023, 8, 5, 14, 30, 0); // September 5, 2023 14:30:00 
+var dateFromTimestamp = new Date(1672531199000); // Unix timestamp in milliseconds 
+var dateFromString = new Date("2023-09-05T14:30:00Z"); // ISO-8601 format
+
+
+自定义文本格式下的月份映射
+```gs
+var dateString = "05-September-2023";
+var parts = dateString.split("-");
+var day = parseInt(parts[0], 10);  // 这里的 10 表示按十进制解析
+var year = parseInt(parts[2], 10);
+
+var months = {
+  January: 0,
+  February: 1,
+  ...
+  December: 11
+};
+
+var month = months[parts[1]];
+var date = new Date(year, month, day);
+Logger.log(date);
+```
+
+
+you can directly subtract one Date object from another, and JavaScript will automatically convert the dates to milliseconds to perform the calculation.  
+When you modify the minutes of a Date object using the Minutes method, JavaScript automatically handles the overflow for you. This means that if the total minutes exceed 60, it will correctly increment the hours and set the minutes to the correct remainder.  
+
+日期的加减计算 结果是毫秒
+```gs
+var anotherDate = new Date(); 
+anotherDate.setDate(anotherDate.getDate() + 10); // 10 days in the future (similar as month, ... calculation)
+```
+
+```gs
+var now = new Date()
+var year = now.getFullYear()
+var lastMonth = now.getMonth() - 1
+var lastMonthDate = new Date(year, lastMonth, 1)
+var lastMonth = Utilities.formatDate(lastMonthDate, 'GMT+08:00', 'yyyyMM')
+```
+
+计算天数差
+```gs
+function differenceInDays(date1, date2) { 
+  var diffTime = Math.abs(date2 - date1); 
+  var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));  // 向上取整
+
+  return diffDays;
+} 
+```
