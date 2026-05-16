@@ -1,0 +1,71 @@
+Windows PowerShell 常用命令
+
+  查看当前目录：pwd
+  
+  进入某个目录：cd "C:\path\to\folder"
+  
+  回到用户主目录：cd ~
+  
+  回到上一级目录：cd ..
+  
+  查看当前目录文件：dir
+  
+  查看隐藏文件：dir -Force
+  
+  清屏：cls
+  
+  创建文件夹：mkdir foldername
+  
+  创建文件：New-Item file.txt
+  
+  查看文件内容：type file.txt
+  
+  编辑文件：notepad file.txt
+  
+  打开当前目录：explorer .
+  
+  复制文件：Copy-Item old.txt new.txt
+  
+  复制文件夹：Copy-Item oldfolder newfolder -Recurse
+  
+  移动或重命名：Move-Item old.txt new.txt
+  
+  删除文件：Remove-Item file.txt
+  
+  删除文件夹，危险：Remove-Item foldername -Recurse
+  
+  强制删除文件夹，非常危险：Remove-Item foldername -Recurse -Force
+
+
+
+Windows cmd 常用命令
+
+  查看当前目录：cd
+  
+  进入某个目录：cd C:\path\to\folder
+  
+  回到上一级目录：cd ..
+  
+  查看文件：dir
+  
+  清屏：cls
+  
+  创建文件夹：mkdir foldername
+  
+  创建文件：type nul > file.txt
+  
+  查看文件内容：type file.txt
+  
+  编辑文件：notepad file.txt
+  
+  打开当前目录：explorer .
+  
+  复制文件：copy old.txt new.txt
+  
+  移动或重命名：move old.txt new.txt
+  
+  删除文件：del file.txt
+  
+  删除文件夹：rmdir foldername
+  
+  删除非空文件夹，危险：rmdir /s foldername
