@@ -1,0 +1,26 @@
+Node 让电脑能运行 JavaScript 的环境。
+以前 JavaScript 主要跑在浏览器里，有了 Node，就能在电脑本地跑 JS 程序。
+
+```
+node -v
+```
+查看 Node 版本
+
+npm 是 Node 自带/常用的包管理工具。用来安装、更新、卸载 JavaScript 工具和依赖。
+-g = global = 全局安装
+不加 -g = 安装到当前项目
+```
+npm install -g xxx
+npm uninstall -g xxx
+```
+
+你安装 Claude Code 用的就是 npm：
+```
+npm install -g @anthropic-ai/claude-code
+-- 用 npm 全局安装 Anthropic 组织下面的 claude-code 这个包
+```
+
+Node = 运行 JavaScript 的环境
+npm = 安装 JavaScript 工具的工具
+Claude Code = 被 npm 安装的一个 AI 编程工具
+claude = 启动 Claude Code 的命令
