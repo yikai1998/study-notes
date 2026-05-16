@@ -1,0 +1,66 @@
+1. 区别
+
+Terminal：
+  终端窗口，本质是“输入命令的地方”
+  Mac 上常用 Terminal.app
+  Windows 上常用 Windows Terminal
+
+Shell：
+  真正解释你输入命令的程序
+  你输入 cd、ls、pwd，这些命令是 shell 在处理
+
+bash：
+  一种 shell
+  Linux / 老版本 Mac 常见
+
+zsh：
+  一种 shell
+  现在 Mac 默认常用 zsh
+  和 bash 很像，新手不用太纠结
+
+cmd：
+  Windows 老牌命令行
+  命令风格比较老
+
+PowerShell：
+  Windows 更现代的命令行
+  新手在 Windows 建议优先学 PowerShell
+
+
+
+2. 打开方式
+
+Mac 打开 Terminal：
+  按 Command + 空格
+  输入 Terminal 或 终端
+  回车
+也可以：
+  应用程序 → 实用工具 → 终端
+
+Windows 打开 PowerShell：
+  按 Win + X
+  选择 Terminal 或 Windows 终端
+也可以：
+  按 Win 键
+  输入 PowerShell
+  回车
+  
+Windows 打开 CMD：
+  按 Win + R
+  输入 cmd
+  回车
+
+Linux：多数用 bash，命令和 Mac 很接近
+
+
+
+3. 判断自己现在用的是谁
+
+Mac 查看当前 shell：
+  echo $SHELL
+
+Windows PowerShell 查看：
+  $PSVersionTable
+
+Windows cmd 查看：
+  echo %COMSPEC%
