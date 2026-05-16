@@ -1,0 +1,61 @@
+安装 Claude Code：npm install -g @anthropic-ai/claude-code 
+
+更新 Claude Code：npm install -g @anthropic-ai/claude-code@latest 
+
+启动 Claude Code：claude 
+
+查看 Claude 版本：claude --version 
+
+查看 Claude 帮助：claude --help 
+
+
+Mac 
+  查看 claude 路径：which claude (which 查的不是“App”，而是 命令的位置)
+  打开 claude 所在目录：open "$(dirname "$(which claude)")" 
+  进入项目目录：cd /path/to/project 
+  查看当前目录：pwd 
+  查看文件：ls 
+  查看隐藏文件：ls -la 
+  打开当前目录：open . 
+  查看 Claude 配置目录：ls -la ~/.claude 
+  打开 Claude 配置目录：open ~/.claude 
+  编辑 Claude 用户配置：open -e ~/.claude/settings.json 
+
+  ```
+  which xxx = 查命令程序在哪里, 程序可以更新、卸载, 配置通常保留，方便以后继续用
+  
+  ~/.xxx = 通常是这个工具的用户配置/数据
+  
+  项目里的 .xxx = 当前项目专用配置
+  ```
+
+  
+Windows 
+  查看 claude 路径：where.exe claude 
+  查看 claude 路径备用：Get-Command claude 
+  进入项目目录：cd C:\path\to\project 
+  查看当前目录：pwd 
+  查看文件：dir 
+  查看隐藏文件：dir -Force 
+  打开当前目录：explorer . 
+  查看 Claude 配置目录：dir ~/.claude -Force 
+  打开 Claude 配置目录：explorer ~/.claude 
+  编辑 Claude 用户配置：notepad ~/.claude/settings.json 
+  
+
+
+Claude 内
+  查看帮助：/help 
+  退出：/exit 
+  空当前对话：/clear 
+  压缩上下文：/compact 
+  打开配置：/config 
+  查看状态：/status 
+  查看权限：/permissions 
+  切换模型：/model 
+  登录：/login 
+  退出登录：/logout 
+  检查安装：/doctor 
+  初始化项目说明：/init 
+  中断 Claude 当前执行：Esc 
+  强制中断或退出 Claude：Ctrl + C 
