@@ -1,0 +1,39 @@
+Mac / Linux 常用命令
+
+查看当前目录：pwd
+
+进入某个目录：cd /path/to/folder
+
+回到用户主目录：cd ~
+
+回到上一级目录：cd ..
+
+查看当前目录文件：ls
+
+查看详细文件信息：ls -l
+
+查看隐藏文件：ls -la
+
+清屏：clear
+
+创建文件夹：mkdir foldername
+
+创建文件：touch file.txt
+
+查看文件内容：cat file.txt
+
+编辑文件，简单方式：open -e file.txt
+
+打开当前目录：open .
+
+复制文件：cp old.txt new.txt
+
+复制文件夹：cp -r oldfolder newfolder
+
+移动或重命名：mv old.txt new.txt
+
+删除文件：rm file.txt
+
+删除文件夹，危险：rm -r foldername
+
+强制删除文件夹，非常危险：rm -rf foldername
