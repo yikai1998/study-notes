@@ -54,6 +54,7 @@ Claude 内
   查看权限：/permissions 
   切换模型：/model 
   登录：/login 
+  继续之前的对话：/resume
   退出登录：/logout 
   检查安装：/doctor 
   初始化项目说明：/init 
