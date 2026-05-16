@@ -1,28 +1,28 @@
 1. 区别
 
-Terminal：
+Terminal: 
   终端窗口，本质是“输入命令的地方”
   Mac 上常用 Terminal.app
   Windows 上常用 Windows Terminal
 
-Shell：
+Shell: 
   真正解释你输入命令的程序
   你输入 cd、ls、pwd，这些命令是 shell 在处理
 
-bash：
+bash: 
   一种 shell
   Linux / 老版本 Mac 常见
 
-zsh：
+zsh: 
   一种 shell
   现在 Mac 默认常用 zsh
   和 bash 很像，新手不用太纠结
 
-cmd：
+cmd: 
   Windows 老牌命令行
   命令风格比较老
 
-PowerShell：
+PowerShell: 
   Windows 更现代的命令行
   新手在 Windows 建议优先学 PowerShell
 
@@ -30,37 +30,120 @@ PowerShell：
 
 2. 打开方式
 
-Mac 打开 Terminal：
+Mac 打开 Terminal: 
   按 Command + 空格
   输入 Terminal 或 终端
   回车
-也可以：
+也可以: 
   应用程序 → 实用工具 → 终端
 
-Windows 打开 PowerShell：
+Windows 打开 PowerShell: 
   按 Win + X
   选择 Terminal 或 Windows 终端
-也可以：
+也可以: 
   按 Win 键
   输入 PowerShell
   回车
   
-Windows 打开 CMD：
+Windows 打开 CMD: 
   按 Win + R
   输入 cmd
   回车
 
-Linux：多数用 bash，命令和 Mac 很接近
+Linux: 多数用 bash，命令和 Mac 很接近
 
 
 
 3. 判断自己现在用的是谁
 
-Mac 查看当前 shell：
+Mac 查看当前 shell: 
   echo $SHELL
 
-Windows PowerShell 查看：
+Windows PowerShell 查看: 
   $PSVersionTable
 
-Windows cmd 查看：
+Windows cmd 查看: 
   echo %COMSPEC%
+
+
+
+4. 路径基础
+
+当前目录: .
+
+上一级目录: ..
+
+用户主目录: 特定于使用者
+Mac / Linux: ~
+Windows PowerShell: ~
+
+根目录: 系统层次结构中最顶层的目录
+Mac / Linux: /
+Windows: C: \
+
+路径有空格时，要加引号: 
+Mac: cd "/Users/me/My Project"
+Windows: cd "C: \Users\me\My Project"
+
+
+
+5. 绝对路径和相对路径
+
+绝对路径：从根位置开始写，完整路径
+
+Mac 例子：/Users/tom/Desktop/project
+
+Windows 例子：C:\Users\tom\Desktop\project
+
+相对路径：从当前目录开始写
+
+例子：
+cd project
+cd ..
+cd ./src
+cd ../other-folder
+
+
+
+6. 最常用快捷键
+
+停止当前命令：Ctrl + C
+
+自动补全：Tab
+
+查看历史命令：↑ ↓
+
+光标移到行首：Ctrl + A
+
+光标移到行尾：Ctrl + E
+
+清屏：
+Mac / Linux: clear
+Windows: cls
+
+
+
+7. 常见符号
+
+. 当前目录
+
+.. 上一级目录
+
+~ 用户主目录
+
+/
+Mac / Linux 路径分隔符
+Windows 路径分隔符
+
+通配符，代表任意内容
+例子：*.txt
+表示所有 txt 文件
+
+&& 前一个命令成功后，再执行下一个
+例子：mkdir test && cd test
+
+把输出写入文件，会覆盖原文件
+例子：echo hello > a.txt
+
+把输出追加到文件末尾
+例子：echo hello >> a.txt
