@@ -13,6 +13,7 @@ Mac / Linux 常用命令
 查看详细文件信息：ls -l
 
 查看隐藏文件：ls -la
+快捷键：Command + Shift + .
 
 清屏：clear
 
