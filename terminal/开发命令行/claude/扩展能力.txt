@@ -12,7 +12,7 @@ skill位置：
 /plugin install plugin-name@claude-plugins-official
 /reload-plugins
 
-安装 GitHub plugin：
+安装第三方 plugin：
 /plugin marketplace add owner/repo  （在 owner/repo 这种简写格式下，默认按 GitHub 仓库解析。如果填的是其他完整来源地址，那就按对应来源解析）
 /plugin install plugin-name
 /reload-plugins
