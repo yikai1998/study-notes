@@ -1,0 +1,25 @@
+Skill  = 教 Claude 怎么做某类任务. 一份说明文件，让 Claude 在特定任务时按你的规则做事
+Plugin = 一整包插件，可能包含 skill / command / agent / hook / MCP
+
+skill位置：
+如：~/.claude/skills/skill-name/SKILL.md
+直接自然语言调用，或claude会自动检索调用
+
+打开插件管理：
+/plugin
+
+安装官方 plugin：
+/plugin install plugin-name@claude-plugins-official
+/reload-plugins
+
+安装 GitHub plugin：
+/plugin marketplace add owner/repo  （在 owner/repo 这种简写格式下，默认按 GitHub 仓库解析。如果填的是其他完整来源地址，那就按对应来源解析）
+/plugin install plugin-name
+/reload-plugins
+
+例：安装 claude-hud：
+/plugin marketplace add jarrodwatts/claude-hud
+/plugin install claude-hud
+/reload-plugins
+/claude-hud:setup
+
