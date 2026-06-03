@@ -8,6 +8,7 @@
 - collect_set  // Collects and returns a set of unique elements.
 - listagg
 - string_agg
+- filter  // Filters the input array using the given predicate.
 
 ```sql
 select 
@@ -18,6 +19,7 @@ from values ('a', 'happy'), ('b', 'sad'), ('c', 'happy') as tab(grade, emo)
 group by 1;
 
 SELECT string_agg(col) WITHIN GROUP (ORDER BY col DESC) FROM VALUES ('a'), ('b'), ('c') AS tab(col);
+select array_size( filter(split(trim(tks.comment), '\\s+'), x -> x is not null and x <> '') );  -- '\\s+' = SQL text needed to represent regex \s+
 ```
 
 
