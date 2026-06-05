@@ -13,10 +13,24 @@ Surface metrics (what happened?)
     ↓
 Segmentation (who / where / when?)
     ↓
-Causal signals (why did it happen?)
+Statistical validation (is this real or noise?)
     ↓
-Actionable output (what should we do?)
+Multivariate control (which factors independently matter?)
+    ↓
+Actionable output (what should we do, and by how much?)
 ```
+
+### A Note on Statistical Rigour
+
+Descriptive metrics alone are insufficient for decision-making:
+- A "5% difference" between two channels could be random noise with small samples.
+- A channel might look bad because it attracts users from high-risk countries, not because the channel itself is problematic.
+- A recommendation without a magnitude estimate is an opinion, not an analysis.
+
+This pipeline addresses these gaps with three additions:
+1. **Significance tests** (chi-square, Mann-Whitney U) to distinguish signal from noise.
+2. **Logistic regression** to isolate each factor's independent contribution to suspension risk.
+3. **Quantified impact estimates** attached to every recommendation.
 
 Each section peels back one layer. The final recommendations synthesise all layers into prioritised actions.
 
@@ -51,13 +65,15 @@ Each section peels back one layer. The final recommendations synthesise all laye
 - Monthly aggregation using `.groupby("reg_year_month")`
 - Four quality proxies tracked in parallel: active rate, KYC pass rate, 2FA adoption
 - **Pearson correlation** between monthly volume and active rate — a negative coefficient flags a quality-quantity tradeoff
+- **Mann-Whitney U test**: Splits months into high-volume and low-volume groups, then tests whether their active rate distributions are statistically different. Unlike a t-test, Mann-Whitney makes no normality assumption — appropriate for rate data over a small number of months.
 
 **How to read the charts:**
 - The bar chart (top-left) shows whether growth is accelerating, decelerating, or seasonal
 - The three line charts track quality metrics on the same x-axis — look for divergence from the volume chart
 - A flat or declining quality trend alongside rising volume is a red flag
+- The Mann-Whitney result tells you whether the apparent tradeoff is real (p < 0.05) or could be sampling noise
 
-**Key insight type:** Trend analysis, correlation
+**Key insight type:** Trend analysis, non-parametric hypothesis testing
 
 ---
 
@@ -69,15 +85,18 @@ Each section peels back one layer. The final recommendations synthesise all laye
 
 **Technique:**
 - Group by `registration_source`, compute five metrics per channel
-- Side-by-side bar charts for direct visual comparison
-- The scatter plot in S4 correlates KYC failure rate with suspension rate per channel, revealing whether a channel's KYC failures predict its fraud rate
+- **Chi-square test of independence** with **Cramér's V effect size**: Tests whether channel membership and outcome (suspended/not) are truly associated, and how strongly.
+  - Cramér's V < 0.10: negligible — differences are likely noise
+  - Cramér's V 0.10–0.20: small but real effect
+  - Cramér's V > 0.20: meaningful channel-level quality difference
+- **Wilson 95% confidence interval error bars** on bar charts: the Wilson formula handles proportions near 0 or 1 better than the standard normal approximation. Overlapping CIs between channels suggest the visual difference may not be meaningful.
 
 **How to read the charts:**
-- Active rate + KYC pass rate = positive quality indicators (higher is better)
-- Suspension rate = negative risk indicator (lower is better)
+- Bars show point estimates; whiskers show the range of plausible true values
+- Two bars whose whiskers overlap cannot be confidently ranked — more data is needed
 - A channel with high volume but low active rate + high suspension rate is a candidate for budget reduction or traffic-quality audits
 
-**Key insight type:** Comparative benchmarking
+**Key insight type:** Comparative benchmarking, statistical significance testing
 
 ---
 
@@ -111,16 +130,23 @@ Each section peels back one layer. The final recommendations synthesise all laye
 **Why it matters:** If suspended accounts cluster on specific attributes (channel, KYC status, email verification), those attributes become early-warning risk signals. They can be used to gate high-risk users into enhanced verification before they accumulate fraud.
 
 **Technique:**
-- **Breakdown table:** Suspension rate segmented by each categorical attribute individually
+- **Breakdown table:** Suspension rate segmented by each categorical attribute individually — univariate, does not control for confounders
 - **Cross-tabulation heatmap:** `kyc_status × email_verified → suspension rate` — a 2D view reveals interaction effects (e.g., `kyc_failed + email unverified` may have 3× the suspension rate of either factor alone)
-- **Scatter plot:** Plots each channel's KYC failure rate against its suspension rate — a linear trend would confirm that KYC failure is a leading indicator of fraud
+- **Logistic regression (statsmodels):** The key multivariate addition. Fits all features simultaneously and estimates the independent contribution of each to suspension probability. Outputs:
+  - **Odds ratio (OR)**: how much a one-unit change in a feature multiplies the odds of suspension, holding all else constant. OR > 1 = increases risk; OR < 1 = decreases risk.
+  - **95% confidence interval**: if the CI includes 1.0, the effect is not statistically significant
+  - **p-value**: probability of seeing this OR by chance if the true effect is zero
+  - **ROC-AUC**: model's discriminating ability. 0.5 = no better than random; 0.70+ = usable risk score; 0.80+ = good model
+- **Forest plot**: standard medical/clinical format for presenting multiple odds ratios. Each bar's length = OR magnitude; whiskers = CI. Reference line at OR = 1.
 
-**How to read the charts:**
-- Dark red cells in the heatmap = high-risk combinations
-- Channels in the upper-right of the scatter plot have both high KYC failures and high suspensions — strongest candidates for scrutiny
-- Channels with high KYC failures but low suspensions may have stricter self-screening (users who fail simply leave rather than commit fraud)
+**Why logistic regression matters here:** Without it, we might conclude "Channel X has high suspension rate" when actually Channel X mostly acquires users from high-risk countries. The regression disentangles these effects.
 
-**Key insight type:** Risk factor analysis, feature importance (manual)
+**How to read the forest plot:**
+- Bars to the right of OR = 1: risk-increasing features
+- Bars to the left: risk-reducing features (e.g., `email_verified = True` should reduce suspension risk)
+- Whiskers crossing 1.0: not statistically significant — interpret with caution
+
+**Key insight type:** Multivariate risk modelling, logistic regression
 
 ---
 
@@ -153,14 +179,19 @@ Each section peels back one layer. The final recommendations synthesise all laye
 **Technique:**
 - Group by registration month, compute quality metrics per cohort
 - **3-month rolling average** (`rolling(3, min_periods=1)`) smooths month-to-month noise and reveals underlying trends
-- **Linear trend slope** via polynomial fit (`polyfit(x, y, 1)`) gives a single signed number — positive = improving, negative = declining
+- **Linear trend slope** via polynomial fit gives a single signed number — positive = improving, negative = declining
+- **Cohort survival proxy** (new): plots each cohort's current active rate against its age in months. Fits an OLS trendline. If the slope is negative, older cohorts are less active — a cross-sectional proxy for retention decay.
 
-**How to read the charts:**
-- Bars = raw monthly values (noisy); line = smoothed trend (signal)
-- A consistently declining line across all three metrics (active, KYC, 2FA) suggests a structural degradation in acquisition quality
-- Sudden spikes in one month often correlate with a specific campaign or channel change
+**Limitation of the survival proxy:** This is NOT a true longitudinal retention curve, which would require tracking the same users' activity status at multiple points in time. Here we only have a single snapshot of `account_status`. The proxy is biased: newer cohorts haven't had time to churn, so they look artificially healthier. Interpret the slope as a directional indicator, not a precise retention rate.
 
-**Key insight type:** Trend analysis, cohort comparison
+**What a proper retention curve needs:** A table of `(user_id, activity_date)` events, from which you can compute "of users registered in month M, what fraction were still active N months later." Recommend adding activity logging if this data doesn't exist.
+
+**How to read the survival proxy chart:**
+- Each bubble = one registration cohort; bubble size = cohort size
+- Negative trendline slope: older cohorts have lower active rates (consistent with churn)
+- Flat slope: no evidence of long-term decay in this dataset (or dataset not old enough to show it)
+
+**Key insight type:** Trend analysis, survival proxy, cohort comparison
 
 ---
 
@@ -222,14 +253,17 @@ Each section peels back one layer. The final recommendations synthesise all laye
   | 1 − Suspension rate | 15% | Inverted risk signal |
 
 - All five metrics are already in [0, 1], so no normalisation step is needed
-- The score is [0, 1] by construction
+- **Weight justification (new):** Displays each metric's Pearson correlation with `suspended_rate`. Metrics with stronger negative correlation with suspension (i.e., they identify safer channels) better justify higher weights. If the correlation order contradicts the weight order, the weights should be revisited.
+- **Sensitivity analysis (new):** Varies each weight ±50% (redistributed to sum to 1) and checks whether the top/bottom channel changes. If the ranking is stable under all perturbations, the conclusion is robust. If rankings flip, stakeholders should be shown a range of scenarios rather than a single score.
 
 **How to read the chart:**
 - Higher score = healthier channel overall
 - A score gap > 0.10 between channels is operationally significant
-- This score is a **relative** ranking tool, not an absolute standard — a score of 0.75 is only good relative to other channels in this dataset
+- Sensitivity analysis result tells you how much to trust the exact ordering
 
-**Key insight type:** Multi-criteria decision analysis (MCDA), composite index
+**Ideal improvement:** Use a metric's correlation with actual revenue or LTV (if available) to set weights empirically rather than by judgement.
+
+**Key insight type:** Multi-criteria decision analysis (MCDA), sensitivity analysis
 
 ---
 
@@ -237,19 +271,23 @@ Each section peels back one layer. The final recommendations synthesise all laye
 
 **Core question:** Given all of the above, what should the team actually do?
 
-**Technique:** Synthesis — each recommendation traces back to a specific numerical finding from prior sections. The output is structured into four domains:
+**Technique:** Synthesis — each recommendation traces back to a specific numerical finding from prior sections, with a quantified expected impact estimate attached.
 
-| Domain | Focus |
-|--------|-------|
-| Growth Quality | Channel budget reallocation |
-| KYC Optimisation | Re-engagement and process improvement |
-| Risk Controls | Fraud prevention guardrails |
-| Compliance | Regulatory exposure remediation |
+| Domain | Focus | Success Metric |
+|--------|-------|----------------|
+| Growth Quality | Channel budget reallocation | Overall quality score, 60-day active rate of new cohorts |
+| KYC Optimisation | Re-engagement + process SLA | # newly verified, median review time |
+| Risk Controls | Transaction limits, IP velocity | 30-day suspension rate delta |
+| Compliance | Re-consent / account closure | % no-terms accounts resolved |
+| Security | 2FA mandate | 2FA adoption rate at 90 days |
+
+**Effort × Impact prioritisation:** Recommendations are explicitly ranked by implementation effort vs expected impact. This prevents high-effort, low-impact work from crowding out quick wins.
 
 **How to use this output:**
-- Each bullet includes a user count — use this to prioritise by impact magnitude
-- Recommendations are independent; they can be actioned in parallel by different teams
+- Each finding includes a user count — use this to prioritise by impact magnitude
+- Each recommendation includes a specific measurable outcome — define a baseline before acting, then measure change
 - Re-run the full pipeline after any significant product or campaign change to refresh the numbers
+- The impact estimates use conservative conversion assumptions (e.g., 15% KYC re-engagement rate). Replace with your own product benchmarks for more accurate projections.
 
 ---
 
