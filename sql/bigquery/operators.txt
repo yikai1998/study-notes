@@ -60,3 +60,4 @@ WHERE code LIKE '_1%'  -- 含义 第二个字符是 1。
 ```
 An underscore ```_``` matches a single character or byte.
 You can escape ```\``` ```_``` ```%``` using two backslashes. For example, ```\\%```. If you are using raw strings, only a single backslash is required. For example, ```r'\%'```
+'\\%' == r'\%'
