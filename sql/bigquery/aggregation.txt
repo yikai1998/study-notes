@@ -1,7 +1,9 @@
 聚合函数（Aggregate Functions）与窗口函数（Window Functions）的主要区别在于：聚合函数会“压缩”结果，而窗口函数会“保留”结果。
+
 聚合函数写法：
 SELECT test_id, SUM(test_score) AS total FROM ExamTable GROUP BY test_id;
 (结果：每个 test_id 只有一行，显示该组的总分)
+
 窗口函数（Navigation/Window）写法：
 SELECT test_id, test_score, SUM(test_score) OVER(PARTITION BY test_id) AS total FROM ExamTable;
 (结果：保留所有行，但每一行都会多出一列显示该 test_id 组的总分)
