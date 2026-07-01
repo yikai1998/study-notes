@@ -1,6 +1,10 @@
 3 different ways you can combine named windows and use them in a window function's OVER clause, they all return the same results.
+
 the WINDOW clause defines a reusable window specification.  
+
+
 1)直接定义：创建一个完整的窗口规格
+
 ```sql
 SELECT
   item,
@@ -15,7 +19,9 @@ WINDOW item_window AS (
   ROWS BETWEEN 2 PRECEDING AND 2 FOLLOWING
 )
 ```
-2)链式继承：像搭积木一样，b 继承 a 的分区，c 在 b 的基础上增加排序和范围。
+
+2)链式继承：像搭积木一样，b 继承 a 的分区，c 在 b 的基础上增加排序和范围
+
 ```sql
 SELECT
   item,
@@ -30,7 +36,9 @@ WINDOW
   c AS (b ROWS BETWEEN 2 PRECEDING AND 2 FOLLOWING), 
   d AS (c) 
 ```
+
 3)组合使用：在 OVER 子句中引用已有的命名窗口，并临时追加 ROWS/RANGE 限制。
+
 ```sql
 SELECT
   item, purchases,
@@ -44,6 +52,7 @@ WINDOW
   c AS b 
 ```
 
+
 默认窗口帧 (Default Window Frame) 陷阱
 没有 ORDER BY 时：默认是 ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING（整个分区）
 有 ORDER BY 时：默认是 RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW（从分区开始到当前“值”的所有行）
@@ -51,6 +60,8 @@ WINDOW
 ROWS：基于物理行号（行数偏移）。典型用途: “前3行到后3行”
 RANGE：基于 ORDER BY 列的值（值偏移）。在处理并列数据（Ties）时，RANGE 会将相同值的行作为一个整体处理。典型用途: “前1天到后1天” 或 “价格正负10元内”
 RANGE 模式的特点是：如果 ORDER BY 的值 x 在多行相同（比如 2, 2），它会把所有相同的 x 当作一组，一起进行 SUM 计算。  
+
+
 
 窗口函数常用场景模板
 计算总计 (Grand Total):
@@ -82,6 +93,7 @@ QUALIFY 窗口函数的过滤器
 QUALIFY 的地位相当于窗口函数的 HAVING。
 作用：在不使用子查询或 CTE 的情况下，直接过滤窗口函数的结果（如 ROW_NUMBER() = 1）。
 执行顺序：它在窗口函数计算之后执行，是 SQL 执行顺序中最后几个步骤之一。
+
 ```sql
 SELECT item FROM Produce
 WHERE true
