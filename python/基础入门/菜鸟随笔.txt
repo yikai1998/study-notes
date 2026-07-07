@@ -5,8 +5,7 @@ pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pygal
 
 【常用运算符】
 % 取模 
-** 幂（返回X的Y次幂） 
-a**b为‘a的b次方’ 
+** 幂（返回X的Y次幂） a**b为‘a的b次方’ 
 // 取整除 
 
 
