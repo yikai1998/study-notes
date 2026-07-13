@@ -11,3 +11,4 @@
 | [python/](./python/) | Python 基础、数据分析、爬虫、工作经验 |
 | [sql/](./sql/) | BigQuery & Databricks SQL 语法参考 |
 | [terminal/](./terminal/) | Mac / Windows 终端、Git、Node、Claude CLI |
+| [dingtalk-scripts/](./dingtalk-scripts/) | 钉钉文档脚本 持续更新中 |
