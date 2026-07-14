@@ -30,3 +30,18 @@ mysql> SELECT *
 |    2 |  222 |
 +------+------+
 ```
+
+从分析思维上，JSON_TABLE确实有点像 BigQuery 的 UNNEST() / Spark 的 explode()。MySQL 官方文档说明 JSON_TABLE() 可以把 JSON document 里的数据提取出来，并以关系表形式返回。
+```sql
+SELECT
+  o.order_id,
+  jt.sku
+FROM orders o
+LEFT JOIN JSON_TABLE(
+  o.items_json,
+  '$[*]' COLUMNS (
+    sku VARCHAR(50) PATH '$.sku'
+  )
+) AS jt
+ON TRUE;
+```
