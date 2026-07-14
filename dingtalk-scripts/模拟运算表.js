@@ -1,5 +1,11 @@
+/**
+要求：
+1. 必须用Simulation这个sheet
+2. 必须从 H1:H2 读取配置 如：H1=A1:B5，H2=C1:C5
+*/
+
 function runSimulation() {
-    // 要求必须用Sumulation这个sheet
+    // 定位
     const ws = getSheetByName("Simulation");  // 自定义函数 getSheetByName
 
     if (!ws) {
@@ -9,7 +15,6 @@ function runSimulation() {
 
     Output.log("Using sheet: " + ws.getName());
 
-    // 要求必须从 H1:H2 读取配置
     const configValues = ws.getRange("H1:H2").getValues();
     const inputRangeText = String(configValues[0][0] || "").trim();  // 已知参数存在哪个range里
     const outputRangeText = String(configValues[1][0] || "").trim();  // 输出结果存在哪个range里
@@ -17,6 +22,7 @@ function runSimulation() {
     Output.log("inputRange = " + inputRangeText);
     Output.log("outputRange = " + outputRangeText);
 
+    // 核验
     if (!inputRangeText) {
         Output.log("Config error: H1 input range is empty. Example: A1:A20");
         return;
@@ -42,6 +48,7 @@ function runSimulation() {
         return;
     }
 
+    // 模拟
     const results = [];
     Output.log("Simulation started. Total cases: " + inputRowCount);
 
@@ -60,6 +67,7 @@ function runSimulation() {
         );
     }
 
+    // 更新
     const resultColCount = results[0] ? results[0].length : 0;
     if (resultColCount !== outputColCount) {
         Output.log(
@@ -76,8 +84,8 @@ function runSimulation() {
 
 // 你的计算逻辑
 function calculateResult(row) {
-    // 如果输入是多列参数，const a = Number(row[0]); const b = Number(row[1]); ...
-    return Number(row[0]) * 10;
+    // 目前是假设输入2列参数
+    return Number(row[0]) * 1010 + Number(row[1]) * 110;
 }
 
 // 按名称找 sheet
