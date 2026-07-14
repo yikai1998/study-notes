@@ -1,0 +1,35 @@
+CONCAT
+CONCAT_WS  -- 好处是分隔符统一
+SELECT CONCAT_WS('-', 'US', 'CA', 'SF') AS location_key;
+
+LENGTH
+
+LEFT
+RIGHT
+SUBSTRING
+
+查找位置
+```sql
+SELECT
+INSTR('airwallexair', '@') AS at_pos,  -- 0
+LOCATE('@', 'airwalledddx@air') AS at_pos_2  -- 13
+```
+
+REPLACE
+
+没有类似split的功能
+SUBSTRING_INDEX  -- 按分隔符截取字符串语法返回一个str 的子字符串
+```sql
+SELECT
+SUBSTRING_INDEX('aq@ws@asd', '@', 1) AS a,  -- aq
+SUBSTRING_INDEX('aq@ws@asd', '@', 2) AS b,  -- aq@ws
+SUBSTRING_INDEX('aq@ws@asd', '@', 3) AS c,  -- aq@ws@asd
+SUBSTRING_INDEX('aq@ws@asd', '@', -1) AS d,  -- asd
+SUBSTRING_INDEX('aq@ws@asd', '@', -2) AS e  -- ws@asd
+```
+
+REGEXP_LIKE
+REGEXP_REPLACE
+REGEXP_SUBSTR
+
+COALESCE
