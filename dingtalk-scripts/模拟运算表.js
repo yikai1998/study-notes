@@ -9,7 +9,6 @@ function runSimulation() {
 
     Output.log("Using sheet: " + ws.getName());
 
-  
     // 要求必须从 H1:H2 读取配置
     const configValues = ws.getRange("H1:H2").getValues();
     const inputRangeText = String(configValues[0][0] || "").trim();  // 已知参数存在哪个range里
@@ -33,8 +32,8 @@ function runSimulation() {
 
     const inputValues = inputRange.getValues();
     const inputRowCount = inputValues.length;
-    const outputRowCount = getRangeRowCount(outputRangeText);
-    const outputColCount = getRangeColCount(outputRangeText);
+    const outputRowCount = getRangeRowCount(outputRangeText);  // 自定义函数 getRangeRowCount
+    const outputColCount = getRangeColCount(outputRangeText);  // 自定义函数 getRangeColCount
 
     if (inputRowCount !== outputRowCount) {
         Output.log(
@@ -57,7 +56,7 @@ function runSimulation() {
         }
 
         Output.log(
-            `case ${i + 1}/${inputRowCount}: param=${param}, result=${JSON.stringify(result)}`
+            `case ${i + 1}/${inputRowCount}: row=${row}, result=${JSON.stringify(result)}`
         );
     }
 
@@ -96,15 +95,7 @@ function getSheetByName(name) {
     return null;
 }
 
-
-/**
- * 获取 range 行数
- * 支持：
- * A1:A5
- * A1:B5
- * B3:D10
- * A1
- */
+// 获取 range 行数
 function getRangeRowCount(rangeText) {
     const parts = rangeText.split(":");
 
@@ -118,14 +109,7 @@ function getRangeRowCount(rangeText) {
     return endRow - startRow + 1;
 }
 
-
-/**
- * 获取 range 列数
- * 支持：
- * A1:A5 -> 1
- * A1:B5 -> 2
- * B3:D10 -> 3
- */
+// 获取 range 列数
 function getRangeColCount(rangeText) {
     const parts = rangeText.split(":");
 
@@ -139,10 +123,7 @@ function getRangeColCount(rangeText) {
     return endCol - startCol + 1;
 }
 
-
-/**
- * 从 A1 提取行号 1
- */
+// 从 A1 提取行号 1
 function getRowNumberFromCell(cellText) {
     const match = cellText.match(/\d+/);
 
@@ -154,13 +135,7 @@ function getRowNumberFromCell(cellText) {
 }
 
 
-/**
- * 从 A1 提取列号
- * A -> 1
- * B -> 2
- * Z -> 26
- * AA -> 27
- */
+// 从 A1 提取列号 e.g. Z -> 26 / AA -> 27
 function getColNumberFromCell(cellText) {
     const match = cellText.match(/[A-Z]+/i);
 
@@ -173,11 +148,13 @@ function getColNumberFromCell(cellText) {
     let colNumber = 0;
 
     for (let i = 0; i < letters.length; i++) {
-        colNumber = colNumber * 26 + letters.charCodeAt(i) - 64;
+        colNumber = colNumber * 26 + letters.charCodeAt(i) - 64;  // 取字符串里第 i 个字符的编码
     }
 
     return colNumber;
 }
 
 
+
+// main
 runSimulation();
