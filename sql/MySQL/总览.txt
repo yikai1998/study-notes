@@ -41,3 +41,29 @@ SELECT *
 FROM tmp_customer_spend
 WHERE total_spend >= 40;
 ```
+
+注意点:
+1. WHERE 条件最好命中索引
+2. JOIN key 最好有索引
+3. 大表不要 SELECT *
+4. 大表不要随便 ORDER BY RAND()
+5. 避免无条件全表扫
+6. 聚合前尽量先过滤
+
+在公司数据库里，尤其生产环境，不要随便执行：
+```sql
+-- 插入数据
+INSERT INTO test_users (user_id, name, created_at)
+VALUES (1, 'Alice', NOW());
+
+-- 更新数据
+UPDATE test_users
+SET name = 'Alice Wang'
+WHERE user_id = 1;
+
+-- 删除数据
+DELETE FROM test_users
+WHERE user_id = 1;
+
+-- 删除表
+DROP TABLE IF EXISTS test_users;
