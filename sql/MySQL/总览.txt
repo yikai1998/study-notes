@@ -1,0 +1,44 @@
+常用关键字：
+SELECT
+FROM
+WHERE
+JOIN
+GROUP BY
+HAVING
+ORDER BY
+LIMIT
+WITH
+UNION
+CASE WHEN
+EXISTS
+IN
+LIKE
+IS NULL
+
+和 BigQuery 最大区别：
+MySQL 没有 QUALIFY
+MySQL 没有 UNNEST 风格的数组处理
+MySQL 日期函数不同
+MySQL 更需要注意索引和性能
+
+命令类型 分析师最常用：
+SELECT
+CREATE TEMPORARY TABLE
+CREATE TABLE AS SELECT
+DROP TABLE IF EXISTS
+EXPLAIN
+
+```sql
+DROP TEMPORARY TABLE IF EXISTS tmp_customer_spend;
+
+CREATE TEMPORARY TABLE tmp_customer_spend AS
+SELECT
+  CustomerId,
+  SUM(Total) AS total_spend
+FROM Invoice
+GROUP BY CustomerId;
+
+SELECT *
+FROM tmp_customer_spend
+WHERE total_spend >= 40;
+```
