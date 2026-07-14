@@ -23,9 +23,8 @@ MySQL 更需要注意索引和性能
 
 命令类型 分析师最常用：
 SELECT ...;
-CREATE TEMPORARY TABLE xxx AS SELECT ...;
-CREATE TABLE xxx AS SELECT ...;
-DROP TABLE IF EXISTS xxx;
+CREATE (TEMPORARY) TABLE xxx AS SELECT ...;
+DROP (TEMPORARY) TABLE IF EXISTS xxx;
 EXPLAIN QUERY PLAN SELECT ...; 看执行计划 返回的是比较容易读的查询计划
 
 ```sql
