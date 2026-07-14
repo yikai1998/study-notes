@@ -1,0 +1,30 @@
+MySQL 没有 BigQuery 那么方便的 PIVOT / UNPIVOT，通常用 CASE WHEN 和 UNION ALL
+
+PIVOT 行转列
+```sql
+SELECT
+  DATE_FORMAT(InvoiceDate, '%Y-%m') AS invoice_month,
+  SUM(CASE WHEN BillingCountry = 'USA' THEN Total ELSE 0 END) AS usa_revenue,
+  SUM(CASE WHEN BillingCountry = 'Canada' THEN Total ELSE 0 END) AS canada_revenue,
+  SUM(CASE WHEN BillingCountry = 'France' THEN Total ELSE 0 END) AS france_revenue
+FROM Invoice
+GROUP BY DATE_FORMAT(InvoiceDate, '%Y-%m')
+ORDER BY invoice_month;
+```
+
+UNPIVOT 列转行
+```sql
+SELECT
+  month,
+  'USA' AS country,
+  usa_revenue AS revenue
+FROM monthly_metrics
+
+UNION ALL
+
+SELECT
+  month,
+  'Canada' AS country,
+  canada_revenue AS revenue
+FROM monthly_metrics;
+```
