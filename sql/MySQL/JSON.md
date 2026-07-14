@@ -45,3 +45,65 @@ LEFT JOIN JSON_TABLE(
 ) AS jt
 ON TRUE;
 ```
+
+```sql
+SELECT
+  a.*,
+  jt.sku,
+  jt.qty,
+  jt.price
+FROM (
+  SELECT
+    1 AS order_id,
+    101 AS customer_id,
+    JSON_ARRAY(
+      JSON_OBJECT('sku', 'A001', 'qty', 2, 'price', 10.50),
+      JSON_OBJECT('sku', 'B002', 'qty', 1, 'price', 20.00)
+    ) AS items_json
+
+  UNION ALL
+
+  SELECT
+    2 AS order_id,
+    102 AS customer_id,
+    JSON_ARRAY(
+      JSON_OBJECT('sku', 'C003', 'qty', 3, 'price', 5.25)
+    ) AS items_json
+
+  UNION ALL
+
+  SELECT
+    3 AS order_id,
+    103 AS customer_id,
+    JSON_ARRAY() AS items_json
+
+  UNION ALL
+
+  SELECT
+    4 AS order_id,
+    104 AS customer_id,
+    NULL AS items_json
+) AS a
+LEFT JOIN JSON_TABLE(
+  a.items_json,
+  '$[*]' COLUMNS (
+    sku VARCHAR(50) PATH '$.sku',
+    qty INT PATH '$.qty',
+    price DECIMAL(10,2) PATH '$.price'
+  )
+) AS jt
+ON TRUE
+ORDER BY
+  a.order_id,
+  jt.sku;
+
++----------+-------------+----------------------------------------------------------------------------------------+------+------+-------+
+| order_id | customer_id | items_json                                                                             | sku  | qty  | price |
++----------+-------------+----------------------------------------------------------------------------------------+------+------+-------+
+|        1 |         101 | [{"qty": 2, "sku": "A001", "price": 10.50}, {"qty": 1, "sku": "B002", "price": 20.00}] | A001 |    2 | 10.50 |
+|        1 |         101 | [{"qty": 2, "sku": "A001", "price": 10.50}, {"qty": 1, "sku": "B002", "price": 20.00}] | B002 |    1 | 20.00 |
+|        2 |         102 | [{"qty": 3, "sku": "C003", "price": 5.25}]                                             | C003 |    3 |  5.25 |
+|        3 |         103 | []                                                                                     | NULL | NULL |  NULL |
+|        4 |         104 | NULL                                                                                   | NULL | NULL |  NULL |
++----------+-------------+----------------------------------------------------------------------------------------+------+------+-------+
+```
