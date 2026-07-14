@@ -1,0 +1,10 @@
+字符串转数字
+数字转字符串
+字符串转日期
+datetime/date 转换
+decimal 精度
+JSON 取值后再 cast
+
+SELECT CAST('123.77' AS DECIMAL(10,1)) AS amount;
+
+MySQL 没有 BigQuery 的 SAFE_CAST
