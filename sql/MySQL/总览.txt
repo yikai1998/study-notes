@@ -67,3 +67,4 @@ WHERE user_id = 1;
 
 -- 删除表
 DROP TABLE IF EXISTS test_users;
+```
