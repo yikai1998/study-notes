@@ -1,4 +1,5 @@
 CONCAT
+SELECT CONCAT('My', 'S', 'QL');
 CONCAT_WS  -- 好处是分隔符统一
 SELECT CONCAT_WS('-', 'US', 'CA', 'SF') AS location_key;
 
