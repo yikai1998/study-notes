@@ -190,7 +190,7 @@ SELECT to_json(array(map('a', 1)));  -- [{"a":1}]
 
 ```sql
 concat_ws(' ', ikc.data:individualData:firstName::string, ikc.data:individualData:lastName::string) as individual_name
-concat_ws(',', collect_list(maker)
+concat_ws(',', collect_list(maker))
 ```
 
 - contains(left, right)  // Returns a boolean. The value is True if right is found inside left.
