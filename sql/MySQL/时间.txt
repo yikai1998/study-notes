@@ -18,9 +18,19 @@ DATEDIFF(CURDATE(), DATE(InvoiceDate)) AS days_since_invoice
 
 CURDATE() AS current_date_utc
 NOW() AS current_datetime_utc
-UTC_TIMESTAMP() AS current_datetime_utc
+UTC_TIMESTAMP()
 
-CONVERT_TZ(created_at, '+00:00', 'America/New_York') AS created_at_ny
+```sql
+-- 这两个跟着服务器时区走
+CURDATE()
+NOW()
+
+-- 这两个永远是 UTC，不管服务器怎么配置
+UTC_DATE()
+UTC_TIMESTAMP() AS current_datetime_utc
+```
+
+CONVERT_TZ(created_at, '+00:00', 'America/New_York') AS created_at_ny  -- 如果返回 NULL → 说明时区表没装
 CONVERT_TZ(created_at, '+00:00', '-05:00') AS created_at_est
 
 TIMESTAMPDIFF(HOUR, created_at, UTC_TIMESTAMP()) AS hours_since_created
