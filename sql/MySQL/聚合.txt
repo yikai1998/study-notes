@@ -1,6 +1,14 @@
-COUNT(*)
-COUNT(DISTINCT col)
+COUNT(*)          -- 所有行，包括 NULL
+COUNT(col)        -- 该列非 NULL 的行数
+COUNT(DISTINCT col) -- 该列非 NULL 的去重行数
 
 GROUP_CONCAT(DISTINCT city ORDER BY city DESC SEPARATOR ', ')
 
+条件计数
 SUM(CASE WHEN Total >= 10 THEN 1 ELSE 0 END)
+
+条件求和
+SUM(CASE WHEN BillingCountry = 'USA' THEN Total ELSE 0 END) AS usa_revenue
+
+条件占比
+AVG(CASE WHEN Total >= 10 THEN 1.0 ELSE 0 END) AS high_value_rate
