@@ -5,8 +5,17 @@ JSON_EXTRACT函数用于提取JSON类型数据中指定json_path的数据
 JSON_UNQUOTE函数用于去掉JSON数据中的引号
 ```sql
 SELECT JSON_EXTRACT('{"user": {"name": "Jane", "age": 25}}', '$.user.age');
-SELECT JSON_UNQUOTE(JSON_EXTRACT(json '{"name": "John", "age": 25, "city": "New York"}','$.city'));  -- 返回New York
+SELECT JSON_UNQUOTE(JSON_EXTRACT('{"name": "John", "age": 25, "city": "New York"}','$.city'));  -- 返回New York
+
+
+-- JSON_EXTRACT 的简写
+SELECT data->'$.city' FROM users;
+
+-- JSON_UNQUOTE(JSON_EXTRACT(...)) 的简写
+SELECT data->>'$.city' FROM users;
+-- 返回的是不带引号的字符串 ← 更常用
 ```
+
 
 JSON_TABLE 展开数组
 ```sql
@@ -106,4 +115,19 @@ ORDER BY
 |        3 |         103 | []                                                                                     | NULL | NULL |  NULL |
 |        4 |         104 | NULL                                                                                   | NULL | NULL |  NULL |
 +----------+-------------+----------------------------------------------------------------------------------------+------+------+-------+
+```
+
+性能注意事项
+```txt
+-- JSON_TABLE 在大表上很慢！
+-- 因为 MySQL 没办法对 JSON 内部字段建索引
+
+-- 如果频繁查询，考虑：
+-- ① 生成列 + 索引
+ALTER TABLE orders
+  ADD COLUMN first_sku VARCHAR(50)
+  GENERATED ALWAYS AS (JSON_UNQUOTE(items_json->>'$[0].sku')) STORED,
+  ADD INDEX idx_first_sku (first_sku);
+
+-- ② 或者直接把 JSON 拆成正规化的表
 ```
