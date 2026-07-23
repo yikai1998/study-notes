@@ -1,6 +1,6 @@
 # SQL 笔记
 
-BigQuery 与 Databricks SQL 语法参考手册。
+各类 SQL 语法参考手册。
 
 ## BigQuery
 
@@ -39,3 +39,16 @@ BigQuery 与 Databricks SQL 语法参考手册。
 | `sql_functions.txt` | 常用内置函数速查 |
 | `data_type.txt` | 数据类型对照 |
 | `notebook.txt` | Notebook 使用技巧与魔法命令 |
+
+## MySQL
+
+| 文件 | 内容 |
+|------|------|
+| `CAST.txt` | 转换类型 |
+| `JSON.md` | 关于JSON的处理 |
+| `总览.txt` | 入门注意事项 |
+| `文本.txt` | 文本处理 |
+| `时间.txt` | 时间处理 |
+| `窗口.txt` | 窗口函数 |
+| `聚合.txt` | 聚合函数 |
+| `行列专制.txt` | PIVOT vs UNPIVOT |
