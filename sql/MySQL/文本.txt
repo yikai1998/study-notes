@@ -3,11 +3,27 @@ SELECT CONCAT('My', 'S', 'QL');
 CONCAT_WS  -- 好处是分隔符统一
 SELECT CONCAT_WS('-', 'US', 'CA', 'SF') AS location_key;
 
-LENGTH
+LENGTH / CHAR_LENGTH
+```sql
+-- LENGTH 返回的是字节数，不是字符数！
+SELECT LENGTH('abc');        -- 3
+SELECT LENGTH('你好');        -- 6 ← 不是 2！UTF-8 中文占 3 字节
+
+-- 如果要字符数用 CHAR_LENGTH
+SELECT CHAR_LENGTH('你好');   -- 2
+```
 
 LEFT
 RIGHT
 SUBSTRING
+
+TRIM
+```sql
+-- 去掉首尾空格，数据清洗很常用
+SELECT TRIM('  airwallex  ');           -- 'airwallex'
+SELECT TRIM(LEADING  '-' FROM '--abc'); -- 'abc'
+SELECT TRIM(TRAILING '-' FROM 'abc--'); -- 'abc'
+```
 
 查找位置
 ```sql
@@ -32,5 +48,15 @@ SUBSTRING_INDEX('aq@ws@asd', '@', -2) AS e  -- ws@asd
 REGEXP_LIKE
 REGEXP_REPLACE
 REGEXP_SUBSTR
+```sql
+-- REGEXP_LIKE：是否匹配
+SELECT REGEXP_LIKE('airwallex@gmail.com', '@');  -- 1
+
+-- REGEXP_REPLACE：替换匹配到的内容
+SELECT REGEXP_REPLACE('abc123def', '[0-9]+', '#');  -- 'abc#def'
+
+-- REGEXP_SUBSTR：提取匹配到的内容
+SELECT REGEXP_SUBSTR('airwallex@gmail.com', '[a-z]+@[a-z]+');  -- 'airwallex@gmail'
+```
 
 COALESCE
