@@ -14,17 +14,9 @@ ORDER BY invoice_month;
 
 UNPIVOT 列转行
 ```sql
-SELECT
-  month,
-  'USA' AS country,
-  usa_revenue AS revenue
-FROM monthly_metrics
+SELECT month, 'USA' AS country, usa_revenue AS revenue FROM monthly_metrics
 
 UNION ALL
 
-SELECT
-  month,
-  'Canada' AS country,
-  canada_revenue AS revenue
-FROM monthly_metrics;
+SELECT month, 'Canada' AS country, canada_revenue AS revenue FROM monthly_metrics;
 ```
