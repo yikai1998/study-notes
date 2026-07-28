@@ -1,0 +1,119 @@
+1. 表引用
+SELECT * FROM my_project.my_schema.orders WHERE dt = '2024-01-01';
+
+
+2. 数据类型
+SELECT CAST('123' AS BIGINT), CAST(1.5 AS DOUBLE);
+
+
+3. 日期时间函数
+SET odps.sql.timezone=America/New_York;
+
+-- 把 UTC 时间转北京时间
+SELECT FROM_UTC_TIMESTAMP(TIMESTAMP '2024-01-15 04:00:00', 'Asia/Shanghai');
+-- 结果：2024-01-15 12:00:00
+
+-- 把北京时间字符串转 UTC
+SELECT TO_UTC_TIMESTAMP('2024-01-15 12:00:00', 'Asia/Shanghai');
+-- 结果：2024-01-15 04:00:00
+
+
+4. 字符串
+CONCAT(a, b, c) 或 CONCAT_WS(sep, a, b)
+TOLOWER(s)
+TOUPPER(s)
+SUBSTR(s, 1, 5)
+s RLIKE '^\\d+$
+REGEXP_EXTRACT(s, '(\\d+)', 1)
+REPLACE(s, 'old', 'new')
+LENGTH(s)
+
+
+5. 数组展开
+SELECT user_id, tag
+FROM users
+LATERAL VIEW OUTER EXPLODE(tags) t AS tag;
+
+
+6. 窗口函数
+SELECT
+  user_id,
+  amount,
+  SUM(amount) OVER (PARTITION BY user_id ORDER BY dt) AS running_total,
+  ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY dt DESC) AS rn,
+  LAG(amount, 1) OVER (PARTITION BY user_id ORDER BY dt) AS prev_amount
+FROM orders;
+
+
+8. NULL 处理
+SELECT NVL(NULL, 0);        -- 0
+SELECT COALESCE(NULL, NULL, 1);  -- 1
+
+
+9. JSON处理
+SELECT GET_JSON_OBJECT('{"name":"Alice","age":30}', '$.name');      -- Alice（STRING）
+SELECT JSON_EXTRACT('{"name":"Alice"}', '$.name');                  -- "Alice"（JSON 类型）
+
+多字段提取
+-- MaxCompute 低效写法（解析 3 次，别这么写）
+SELECT
+  GET_JSON_OBJECT(json_col, '$.name') AS name,
+  GET_JSON_OBJECT(json_col, '$.age')  AS age,
+  GET_JSON_OBJECT(json_col, '$.city') AS city
+FROM users;
+
+-- MaxCompute 正确写法：JSON_TUPLE 只解析 1 次
+SELECT t.id, jt.name, jt.age, jt.city
+FROM users t
+LATERAL VIEW JSON_TUPLE(t.json_col, 'name', 'age', 'city') jt
+AS name, age, city;
+
+JSON 数组展开
+-- MaxCompute
+-- 先用 GET_JSON_OBJECT 提取数组字符串，再用 EXPLODE
+SELECT id, item
+FROM orders
+LATERAL VIEW EXPLODE(
+  SPLIT(
+    REGEXP_REPLACE(
+      REGEXP_REPLACE(GET_JSON_OBJECT(json_col, '$.items'), '^\\[', ''),
+      '\\]$', ''
+    ), '},\\{'
+  )
+) t AS item;
+如果数组里元素是简单类型（STRING/BIGINT），直接用 GET_JSON_OBJECT(json, '$.items[*]') 配合 EXPLODE + SPLIT 处理。如果数据结构复杂，建议在 ETL 阶段拍平，或者把 JSON 存成 ARRAY<STRING> 类型
+
+
+10. CREATE / REPLACE / TEMP
+MaxCompute 没有 session 级临时表
+
+替换已有表（结构重写，数据清空）
+CREATE OR REPLACE TABLE daily_report (
+  user_id BIGINT,
+  revenue DOUBLE
+);
+
+-- 方案 A：CTE（单条 SQL 内用完即走）
+WITH tmp AS (
+  SELECT user_id, amount FROM orders WHERE dt = '2024-01-01'
+)
+SELECT * FROM tmp WHERE amount > 100;
+
+-- 方案 B：物化 CTE（多次引用、避免重复计算）
+WITH tmp AS MATERIALIZE (
+  SELECT user_id, amount FROM orders WHERE dt = '2024-01-01'
+)
+SELECT * FROM tmp WHERE amount > 100
+UNION ALL
+SELECT * FROM tmp WHERE amount <= 100;
+
+-- 方案 C：建普通表 + 1 天生命周期（跨语句复用）
+CREATE TABLE tmp_orders LIFECYCLE 1 AS
+SELECT user_id, amount FROM orders WHERE dt = '2024-01-01';
+
+CREATE MATERIALIZED VIEW [IF NOT EXISTS] mv LIFECYCLE 7(
+        user_id,
+        tran_amount,
+        tran_date
+) AS SELECT user_id, tran_amount, tran_date FROM alipay_tran UNION ALL
+SELECT user_id, tran_amount, tran_date FROM unionpay_tran;
