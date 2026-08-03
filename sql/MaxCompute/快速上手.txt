@@ -17,6 +17,13 @@ SELECT FROM_UTC_TIMESTAMP(TIMESTAMP '2024-01-15 04:00:00', 'Asia/Shanghai');
 SELECT TO_UTC_TIMESTAMP('2024-01-15 12:00:00', 'Asia/Shanghai');
 -- 结果：2024-01-15 04:00:00
 
+CURRENT_DATE()  -- Returns the date in the session's time zone.
+CURRENT_DATE('UTC-10:00')  -- Get the current date in the Hawaii time zone (UTC-10:00).
+SELECT CURRENT_TIMESTAMP();  -- based on the time zone of the current session or project.会帮你贴心换成local
+GETDATE  -- Returns the current system time. MaxCompute uses UTC+8 as the standard time zone.
+SELECT DATEDIFF(CAST('2023-10-26 14:00:00' AS DATETIME), CAST('2023-10-26 10:00:00' AS DATETIME), 'hh');  -- 0
+
+
 
 4. 字符串
 CONCAT(a, b, c) 或 CONCAT_WS(sep, a, b)
@@ -27,6 +34,7 @@ s RLIKE '^\\d+$
 REGEXP_EXTRACT(s, '(\\d+)', 1)
 REPLACE(s, 'old', 'new')
 LENGTH(s)
+字段聚合 array_join(collect_list(ops_log), "\n") as ops_log_list ... group by xxx
 
 
 5. 数组展开
