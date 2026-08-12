@@ -63,6 +63,9 @@ SELECT COALESCE(NULL, NULL, 1);  -- 1
 SELECT GET_JSON_OBJECT('{"name":"Alice","age":30}', '$.name');      -- Alice（STRING）
 SELECT JSON_EXTRACT('{"name":"Alice"}', '$.name');                  -- "Alice"（JSON 类型）
 
+如果遇到key里面有.
+GET_JSON_OBJECT(routing_result, "$.key['keyyy.nra']") AS kk_failed_reason,
+
 多字段提取
 -- MaxCompute 低效写法（解析 3 次，别这么写）
 SELECT
