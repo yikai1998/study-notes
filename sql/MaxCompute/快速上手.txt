@@ -24,7 +24,7 @@ GETDATE  -- Returns the current system time. MaxCompute uses UTC+8 as the standa
 SELECT DATEDIFF(CAST('2023-10-26 14:00:00' AS DATETIME), CAST('2023-10-26 10:00:00' AS DATETIME), 'hh');  -- 0
 
 筛选日期
-datetime必须要精确到2026-01-01 00:00:00这样，才能隐式转换，或者用TO_DATE('2026-01-01', 'yyyy-mm-dd') 或 CAST('2026-01-01' AS DATETIME)
+datetime必须要精确到2026-01-01 00:00:00这样，才能隐式转换，或者用TO_DATE('2026-01-01', 'yyyy-MM-dd') 或 CAST('2026-01-01' AS DATETIME)
 DATETIME 类型（带 00:00:00 时分秒）。
 
 cast(created_time as date) >= dateadd(current_date(), -60, "dd")
