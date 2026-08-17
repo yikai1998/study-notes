@@ -51,6 +51,9 @@ SELECT user_id, tag
 FROM users
 LATERAL VIEW OUTER EXPLODE(tags) t AS tag;
 
+lateral view outer explode(split(reason_type, ",")) t as split_rt
+lateral view outer posexplode(split(reason_type, ",")) t as pos, split_rt
+
 
 6. 窗口函数
 SELECT
