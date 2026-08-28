@@ -29,7 +29,7 @@ DATETIME 类型（带 00:00:00 时分秒）。
 
 cast(created_time as date) >= dateadd(current_date(), -60, "dd")
 
-日期格式
+文本格式的日期
 date_format(cast(created_time as timestamp), "yyyy-MM-dd")
 
 
