@@ -143,27 +143,21 @@ SELECT user_id, tran_amount, tran_date FROM unionpay_tran;
 
 11. 实操建表
 -- 删掉原来的表
-DROP TABLE IF EXISTS xxxx.yikai_wo_ratio_ana_base;
+drop table if exists cyk_service_provider_payout;
 
 -- 重新建带分区的表（注意：pt 列写在 PARTITIONED BY 里）
-CREATE TABLE xxxx.yikai_wo_ratio_ana_base (
-    wo_created_month STRING,
-    service_provider STRING,
-    service_provider_category STRING,
-    source_type_cn STRING,
-    scene_type_cn STRING,
-    scene_2nd_type STRING,
-    wo_type_clean STRING,
-    total_receipt_count BIGINT,
-    channel_receipt_count BIGINT,
-    manual_wo_count BIGINT
+create table if not exists cyk_service_provider_payout (
+    create_date            string,
+    service_provider       string,
+    pobo_mode              string,
+    public_private         string,
+    target_currency        string,
+    transfer_method        string,
+    payout_request_count   bigint,
+    payout_passed_count    bigint,
+    target_usd_sum         decimal(38,18)
 )
-PARTITIONED BY (pt STRING); -- 声明 pt 为分区字段
+partitioned by (pt string);
 
--- 1. 开启动态分区模式
-SET hive.exec.dynamic.partition = true;
-SET hive.exec.dynamic.partition.mode = nonstrict;
-
--- 2. 自动写入当天日期分区
-INSERT OVERWRITE TABLE atta_customer_asset_dev.yikai_wo_ratio_ana_base PARTITION (pt)
-
+insert overwrite table cyk_service_provider_payout partition (pt)
+select ...
