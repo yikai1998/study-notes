@@ -43,6 +43,7 @@ s RLIKE '^\\d+$
 REGEXP_EXTRACT(s, '(\\d+)', 1)
 REPLACE(s, 'old', 'new')
 LENGTH(s)
+NTH_VALUE()
 字段聚合 array_join(collect_list(ops_log), "\n") as ops_log_list ... group by xxx
 
 
