@@ -32,7 +32,7 @@ cast(created_time as date) >= dateadd(current_date(), -60, "dd")
 文本格式的日期
 date_format(cast(created_time as timestamp), "yyyy-MM-dd")
 
-
+只要满足固定格式且高位在前（年/月/日）的文本日期，都可以直接用字符串进行大小比较（大于、小于、等于）
 
 4. 字符串
 CONCAT(a, b, c) 或 CONCAT_WS(sep, a, b)
