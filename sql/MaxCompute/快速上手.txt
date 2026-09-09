@@ -107,6 +107,11 @@ LATERAL VIEW EXPLODE(
 ) t AS item;
 如果数组里元素是简单类型（STRING/BIGINT），直接用 GET_JSON_OBJECT(json, '$.items[*]') 配合 EXPLODE + SPLIT 处理。如果数据结构复杂，建议在 ETL 阶段拍平，或者把 JSON 存成 ARRAY<STRING> 类型
 
+array长度
+size(from_json(available_service_provider, "array<string>"))
+
+array第一个元素
+get_json_object(available_service_provider, "$[0]")
 
 10. CREATE / REPLACE / TEMP
 MaxCompute 没有 session 级临时表
