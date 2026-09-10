@@ -34,6 +34,18 @@ date_format(cast(created_time as timestamp), "yyyy-MM-dd")
 
 只要满足固定格式且高位在前（年/月/日）的文本日期，都可以直接用字符串进行大小比较（大于、小于、等于）
 
+按照特定步长创建展开时间序列
+select explode(
+    sequence(
+        from_utc_timestamp(dateadd(datetrunc(cast(current_timestamp() as datetime), "day"), -2, "dd"), "Asia/Shanghai"), 
+        from_utc_timestamp(datetrunc(cast(current_timestamp() as datetime), "day"), "Asia/Shanghai"), 
+        interval 15 minute
+    )
+) as slot_start_hkt
+-- 是否掉入该区间可以用 (wl.unix_created_time - wl.unix_created_time % 900) = wts.unix_slot_start_hkt
+-- maxcompute这边的join条件不让用不等于
+-- ODPS-0130071: Semantic analysis exception - only a single expression in the SELECT clause is supported with UDTF's，是因为 MaxCompute (ODPS) 严格限制：在包含 UDTF（如 EXPLODE）的 SELECT 子句中，不能同时查询其他普通的列（比如 user_id、unix_online 等）, 正确写法（使用 LATERAL VIEW）
+
 4. 字符串
 CONCAT(a, b, c) 或 CONCAT_WS(sep, a, b)
 TOLOWER(s)
@@ -167,3 +179,7 @@ partitioned by (pt string);
 
 insert overwrite table cyk_service_provider_payout partition (pt)
 select ...
+
+12. 数学计算
+LEAST(XXX, XXX, XXX, ...)
+GREATEST
