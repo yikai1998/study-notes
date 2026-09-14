@@ -1,0 +1,37 @@
+-- set odps.sql.timezone = America/New_York;
+
+select 
+current_date(),  -- 你现在当地日期
+current_date("UTC+14"),  -- 现在UTC+14的日期
+current_timestamp_ntz(),  -- UTC时间
+current_timestamp_ntz("UTC+08:00"),  -- UTC+8时间
+cast(cast(current_timestamp() as datetime) as timestamp),  -- 你现在当地时间
+current_timestamp(),  -- 你现在当地时间
+cast(current_timestamp() as datetime),  -- 你现在当地时间
+
+dateadd(cast(current_timestamp() as datetime), -1, "dd"),  -- 你当地时间的昨天时间
+dateadd(current_timestamp(), -1, "dd"),  -- 你当地时间的昨天时间
+from_utc_timestamp("2025-03-05 16:00:00.123456789", "+6"),  -- 参数A是UTC时间, 返回参数B当地时间
+from_utc_timestamp(current_timestamp(), "+8"),  -- 由于参数A被转换成了当地时间, 所以最后返回的是UTC+16时间
+datetrunc(current_timestamp(), "hour"),  -- 你现在当地整点时间
+
+sequence(
+    dateadd(datetrunc(current_timestamp(), "day"), -2, "dd"), 
+    datetrunc(current_timestamp(), "day"), 
+    interval 1 day
+),  -- 炸之前是UTC时间, 炸之后自动变成了你当地时间
+
+to_char(current_date(), "yyyyMMdd"),  -- 文本类型 你现在当地时间
+to_char(current_timestamp(), "yyyyMMdd"),  -- 文本类型 你现在当地时间
+to_char(cast(current_timestamp() as datetime), "yyyyMMdd"),  -- 文本类型 你现在当地时间
+date_format(current_timestamp(), "yyyyMM"),  -- 文本类型 你现在当地时间
+to_date("2026-09-08", "yyyy-MM-dd"),  -- datetime类型 2026-09-08 00:00:00
+cast("2023-10-26 10:00:00" as datetime),  -- datetime类型 必须要精确到2026-01-01 00:00:00这样 才能隐式转换
+cast("2023-10-26 10:00:00" as timestamp),  -- timestamp类型 必须要精确到2026-01-01 00:00:00这样 才能隐式转换
+
+datediff(cast("2023-10-26 14:00:00" as datetime), cast("2023-10-26 10:00:00" as datetime), "hh"),  -- 4
+
+unix_timestamp(datetime "2023-10-26 14:00:00"), -- 1698300000
+unix_timestamp(current_timestamp()) % 900,  -- 你现在当地时间距离最近的15min区间过去了多久
+from_unixtime(1237518660)  -- datetime类型 2009-03-20 11:11:00
+;
