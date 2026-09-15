@@ -14,6 +14,7 @@ dateadd(current_timestamp(), -1, "dd"),  -- 你当地时间的昨天时间
 from_utc_timestamp("2025-03-05 16:00:00.123456789", "+6"),  -- 参数A是UTC时间, 返回参数B当地时间
 from_utc_timestamp(current_timestamp(), "+8"),  -- 由于参数A被转换成了当地时间, 所以最后返回的是UTC+16时间
 datetrunc(current_timestamp(), "hour"),  -- 你现在当地整点时间
+extract(hour from current_timestamp()),  -- 你现在当地时间的时点
 
 sequence(
     dateadd(datetrunc(current_timestamp(), "day"), -2, "dd"), 
