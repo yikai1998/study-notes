@@ -1,0 +1,66 @@
+DDL
+完整建表规范
+```
+CREATE TABLE IF NOT EXISTS user_daily_summary (
+    user_id STRING COMMENT '用户ID',
+    online_min DOUBLE COMMENT '在线时长（分钟）'
+)
+COMMENT '每日用户在线时长汇总表' -- 表注释
+PARTITIONED BY (dt STRING COMMENT '分区日期'); -- 分区字段注释
+```
+
+-- 建表后修改 [字段注释]
+ALTER TABLE user_daily_summary CHANGE COLUMN online_min COMMENT '每日在线总时长（分钟）';
+
+-- 建表后修改 [表注释]
+ALTER TABLE user_daily_summary SET TBLPROPERTIES ('comment' = '更新后的表注释：每日用户在线时长及日志汇总');
+
+所有 COMMENT 均属于 DDL结构定义, 必须在建表或修改表结构时设置
+
+
+DML
+`INSERT OVERWRITE` 用于 覆盖写入 数据, 若表或分区中已有数据, 原数据会被清空 并替换
+静态分区 - INSERT OVERWRITE TABLE target_table PARTITION (dt='2026-09-23')
+动态分区 - INSERT OVERWRITE TABLE target_table PARTITION (dt) 不硬编码日期, 由 SELECT 最后一列决定分区
+非分区表: 执行后会清空整张表
+分区表: 只会清空并覆盖指定的单个分区
+接 `SELECT` 语句 适用于从源表提取/加工并大批量写入数据
+接 `VALUES` 语句 适用于手动写入少量固定测试数据或维表数据
+
+INSERT OVERWRITE 用于覆盖写入数据, 属于 DML数据操作, 无法在写入时指定或修改任何注释
+
+```
+INSERT OVERWRITE TABLE target_table PARTITION (dt='2026-09-23')
+VALUES 
+    ('usr_001', 95.5),
+    ('usr_002', 88.0);
+```
+
+追加写入 (INSERT INTO) 保留原数据, 直接在末尾追加新记录
+```
+INSERT INTO TABLE target_table PARTITION (dt='2026-09-23')
+SELECT user_id, online_min FROM source_table;
+```
+
+-- 清空表数据 (保留表结构)
+TRUNCATE TABLE tmp_user_summary;
+
+-- 删掉某一天的数据，其他天的数据保留
+ALTER TABLE user_daily_summary DROP IF EXISTS PARTITION (dt='2026-09-23');
+
+
+DQL
+-- 查看建表 DDL 源码 (包含完整表注释与字段注释)
+SHOW CREATE TABLE user_daily_summary;
+
+-- 查看表元数据结构
+DESCRIBE user_daily_summary;
+
+-- 查看表的所有分区列表
+SHOW PARTITIONS user_daily_summary;
+
+-- 查看表是否存在
+SHOW TABLES LIKE 'user_daily_summary';
+
+
+
