@@ -45,6 +45,9 @@ SELECT user_id, online_min FROM source_table;
 -- 清空表数据 (保留表结构)
 TRUNCATE TABLE tmp_user_summary;
 
+-- 加 IF EXISTS 避免表不存在时报错断流
+DROP TABLE IF EXISTS user_daily_summary;
+
 -- 删掉某一天的数据，其他天的数据保留
 ALTER TABLE user_daily_summary DROP IF EXISTS PARTITION (dt='2026-09-23');
 
