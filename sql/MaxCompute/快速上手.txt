@@ -43,7 +43,7 @@ select explode(
     )
 ) as slot_start_hkt
 -- 是否掉入该区间可以用 (wl.unix_created_time - wl.unix_created_time % 900) = wts.unix_slot_start_hkt
--- maxcompute这边的join条件不让用不等于
+-- maxcompute这边的join条件不让用不等于 (除非加上类似 select /*+ mapjoin(c) */)
 -- ODPS-0130071: Semantic analysis exception - only a single expression in the SELECT clause is supported with UDTF's，是因为 MaxCompute (ODPS) 严格限制：在包含 UDTF（如 EXPLODE）的 SELECT 子句中，不能同时查询其他普通的列（比如 user_id、unix_online 等）, 正确写法（使用 LATERAL VIEW）
 
 4. 字符串
