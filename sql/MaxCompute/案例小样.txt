@@ -1,0 +1,38 @@
+-- 创建一个假期/上班/调休的日历表
+insert overwrite table cyk_dim_calendar
+select  
+    cal_date,
+    case
+        when cal_date in (
+            to_date("2026-01-04", "yyyy-mm-dd")  -- 元旦调休 周日
+            ,to_date("2026-02-14", "yyyy-mm-dd")  -- 春节调休 周六
+            ,to_date("2026-02-28", "yyyy-mm-dd")  -- 春节调休 周六
+            ,to_date("2026-05-09", "yyyy-mm-dd")  -- 劳动节调休 周六
+            ,to_date("2026-09-20", "yyyy-mm-dd")  -- 国庆调休 周日
+            ,to_date("2026-10-10", "yyyy-mm-dd")  -- 国庆调休 周六
+            ) then 1
+        when cal_date in (
+            to_date("2026-01-01", "yyyy-mm-dd"), to_date("2026-01-02", "yyyy-mm-dd"), to_date("2026-01-03", "yyyy-mm-dd")  -- 元旦
+            ,to_date("2026-02-15", "yyyy-mm-dd"), to_date("2026-02-16", "yyyy-mm-dd"), to_date("2026-02-17", "yyyy-mm-dd")  -- 春节
+            ,to_date("2026-02-18", "yyyy-mm-dd"), to_date("2026-02-19", "yyyy-mm-dd"), to_date("2026-02-20", "yyyy-mm-dd")
+            ,to_date("2026-02-21", "yyyy-mm-dd"), to_date("2026-02-22", "yyyy-mm-dd"), to_date("2026-02-23", "yyyy-mm-dd")
+            ,to_date("2026-04-04", "yyyy-mm-dd"), to_date("2026-04-05", "yyyy-mm-dd"), to_date("2026-04-06", "yyyy-mm-dd")  -- 清明
+            ,to_date("2026-05-01", "yyyy-mm-dd"), to_date("2026-05-02", "yyyy-mm-dd"), to_date("2026-05-03", "yyyy-mm-dd")  -- 劳动节
+            ,to_date("2026-05-04", "yyyy-mm-dd"), to_date("2026-05-05", "yyyy-mm-dd")
+            ,to_date("2026-06-19", "yyyy-mm-dd"), to_date("2026-06-20", "yyyy-mm-dd"), to_date("2026-06-21", "yyyy-mm-dd")  -- 端午
+            ,to_date("2026-09-25", "yyyy-mm-dd"), to_date("2026-09-26", "yyyy-mm-dd"), to_date("2026-09-27", "yyyy-mm-dd")  -- 中秋
+            ,to_date("2026-10-01", "yyyy-mm-dd"), to_date("2026-10-02", "yyyy-mm-dd"), to_date("2026-10-03", "yyyy-mm-dd")  -- 国庆
+            ,to_date("2026-10-04", "yyyy-mm-dd"), to_date("2026-10-05", "yyyy-mm-dd"), to_date("2026-10-06", "yyyy-mm-dd")
+            ,to_date("2026-10-07", "yyyy-mm-dd")
+            ) then 0
+        when weekday(cal_date) >= 5 then 0   -- 默认双休 周六=5 周日=6
+        else 1
+    end as is_workday
+from (
+    select 
+    dateadd(to_date("2026-01-01", "yyyy-mm-dd"), t.pos, "dd") as cal_date
+    from (
+        select posexplode(split(repeat("x,", 364), ",")) as (pos, val)
+    ) t
+    where t.pos <= 364
+) d;
